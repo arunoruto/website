@@ -1,14 +1,40 @@
-# Arunoruto Website
-This is the repo associated with my private website: [www.arnaut.me](www.arnaut.me).
-I am using [hugo](https://gohugo.io/) as my static-site generator with the [blowfish](https://github.com/nunocoracao/blowfish) theme.
-The site is hosted on [cloudflare pages](https://pages.cloudflare.com/), but feel free to choose your hosting provider (some examples are [here](https://blowfish.page/docs/hosting-deployment/)).
+# Arunoruto's Personal Website
 
-## Install and Update Theme
-When first cloning the repo, fetch the theme using submodules using
+This repository contains the source code for my personal website: [www.arnaut.me](https://www.arnaut.me).
+
+This project uses [devenv](https://devenv.sh/) to manage the development environment. Ensure it is installed and hooked into the shell (e.g., with `direnv`).
+
+## 🥞 Tech Stack
+
+- **Static Site Generator:** [Hugo](https://gohugo.io/)
+- **Theme:** [Blowfish](https://github.com/nunocoracao/blowfish)
+- **Hosting:** [Cloudflare Pages](https://pages.cloudflare.com/)
+- **Development Environment:** [devenv](https://devenv.sh/)
+
+## 🚀 Getting Started
+
+### 1. Initialize the Theme
+
+This site uses the Blowfish theme as a [Git submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules).
+
+When first cloning the repository, initialize the submodule using the defined `devenv` task:
+
 ```sh
-git submodule update --init --recursive
+devenv task git:submoduleInit
 ```
-and update the theme with
+
+To update the theme to the latest version, run:
+
 ```sh
-git submodule update --remote --merge
+devenv task git:submoduleUpdate
 ```
+
+### 2. Run Locally
+
+The development environment defines a process for running the Hugo server. To start it, simply run:
+
+```sh
+devenv up
+```
+
+This command will start the `hugo serve` process, automatically open a new browser tab, and build any draft or future-dated posts. The local site will be available at `http://localhost:1313/`.
