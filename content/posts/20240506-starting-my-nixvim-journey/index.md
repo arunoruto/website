@@ -1,7 +1,7 @@
 ---
 title: "Starting My NixVim Journey"
 date: 2024-05-06T23:13:22+02:00
-draft: false
+draft: true
 description: "How I started using NixVim"
 tags: ["vim", "nix"]
 series: ["NixVim"]
