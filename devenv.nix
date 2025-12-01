@@ -11,7 +11,13 @@
     blowfish-tools
   ];
 
-  processes.hugo.exec = "${lib.getExe pkgs.hugo} serve";
+  processes.hugo.exec = lib.strings.concatStringsSep " " [
+    "${lib.getExe pkgs.hugo}"
+    "serve"
+    "--openBrowser"
+    "--buildDrafts"
+    "--buildFuture"
+  ];
 
   # https://devenv.sh/services/
   # services.postgres.enable = true;
