@@ -1,0 +1,14 @@
+name: Trigger Cloudflare Pages deploy
+
+# Manually rebuild the site without needing a new commit, e.g. after a
+# theme submodule bump or a Cloudflare-side config change.
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  deploy-hook:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call Cloudflare Pages deploy hook
+        run: curl -fsS -X POST "https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/${{ secrets.CLOUDFLARE_DEPLOY_HOOK_ID }}"
