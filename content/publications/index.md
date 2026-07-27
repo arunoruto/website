@@ -20,4 +20,4 @@ layoutBackgroundHeaderSpace: false
 # layout: "simple"
 ---
 
-{{% orcid id="0000-0002-1631-7083" name="Arnaut" %}}
+{{% publications name="Arnaut" %}}

@@ -9,6 +9,7 @@
     git
     hugo
     blowfish-tools
+    python3
   ];
 
   processes.hugo.exec = lib.strings.concatStringsSep " " [
@@ -37,6 +38,7 @@
   tasks = {
     "git:submoduleInit".exec = "${lib.getExe pkgs.git} submodule update --init --recursive";
     "git:submoduleUpdate".exec = "${lib.getExe pkgs.git} submodule update --remote --merge";
+    "publications:sync".exec = "${lib.getExe pkgs.python3} ${./scripts/sync_publications.py}";
   };
 
   # https://devenv.sh/tests/

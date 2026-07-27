@@ -1,0 +1,37 @@
+name: Sync publications
+
+# Re-fetches ORCID (+ Crossref for DOI'd entries) via scripts/sync_publications.py
+# and commits publications.bib + data/publications.json if anything changed.
+# The Hugo build itself never hits these APIs live - this is the only place
+# that does, on a schedule, so a flaky ORCID/Crossref response can't break
+# the site build.
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # every Monday at 06:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run sync script
+        run: python3 scripts/sync_publications.py
+
+      - name: Commit and push if changed
+        run: |
+          if git diff --quiet -- publications.bib data/publications.json; then
+            echo "No publication changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add publications.bib data/publications.json
+          git commit -m "chore(publications): sync from ORCID/Crossref"
+          git push
