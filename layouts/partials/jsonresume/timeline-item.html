@@ -1,0 +1,46 @@
+{{/*
+Renders one resume entry as a Blowfish-style timeline card.
+Expects a dict: icon, logo (optional), title, url (optional), subtitle (optional),
+dateBadge (optional), summary (optional), tags (optional slice of strings).
+Do not indent this template's HTML output - CommonMark treats 4+ leading
+spaces as a literal code block, which breaks rendering inside the shortcode.
+*/}}
+<li>
+<div class="flex">
+<div class="bg-primary-500 dark:bg-primary-300 text-neutral-50 dark:text-neutral-700 min-w-[30px] h-8 text-2xl flex items-center justify-center rounded-full ltr:-ml-12 rtl:-mr-[79px] mt-5">
+{{ partial "icon" .icon }}
+</div>
+<div class="not-prose block p-6 rounded-lg shadow-2xl flex-1 ms-6 mb-10 break-words">
+<div class="flex flex-wrap items-start justify-between gap-3">
+<div class="flex items-center gap-3">
+{{ with .logo }}
+<img src="{{ . }}" alt="" class="h-12 w-12 flex-none rounded-md bg-neutral-100 object-contain p-1 dark:bg-neutral-800 sm:h-14 sm:w-14">
+{{ end }}
+<div>
+<h3 class="mt-0 mb-0 text-lg font-bold">
+{{ if .url }}
+<a href="{{ .url }}" target="_blank" rel="noopener" class="hover:underline">{{ .title }}</a>
+{{ else }}
+{{ .title }}
+{{ end }}
+</h3>
+{{ with .subtitle }}
+<p class="mt-0 mb-0 text-sm font-medium text-neutral-500 dark:text-neutral-400">{{ . }}</p>
+{{ end }}
+</div>
+</div>
+{{ with .dateBadge }}
+<span class="whitespace-nowrap rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">{{ . }}</span>
+{{ end }}
+</div>
+{{ with .summary }}
+<p class="mt-3 mb-0 text-neutral-600 dark:text-neutral-300">{{ . }}</p>
+{{ end }}
+{{ with .tags }}
+<div class="mt-3 flex flex-wrap gap-2">
+{{ range . }}<span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">{{ . }}</span>{{ end }}
+</div>
+{{ end }}
+</div>
+</div>
+</li>

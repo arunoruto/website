@@ -19,7 +19,6 @@ showViews: false
 showLikes: false
 showComments: false
 layoutBackgroundHeaderSpace: false
-# layout: "simple"
 
 ---
 

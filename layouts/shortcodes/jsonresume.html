@@ -9,282 +9,167 @@
 {{ errorf "Mardown Importer Shortcode - Unable to get remote resource" . }}
 {{ end }}
 
-{{/*  If the site has the single layout property, additinal data will be shown in the tables  */}}
-{{ $layout := .Page.Params.layout | default "" }}
-
-<style>
-td.dates > p {
-display: inline-block;
-}
-
-@media screen and (min-width: 0px) {    
-
-.customEntitityLogo {
-background-color: aliceblue;
-position: relative;
-min-width: 60px;
-width: 60px;
-height: 60px;
-margin: 0px;
-margin-top: 10px;
-margin-bottom: 10px;
-padding: 5px;
-object-fit: contain;
-border-radius: 4%;
-}
-
-}
-
-@media screen and (min-width: 700px) {
-.customEntitityLogo {
-background-color: aliceblue;
-position: relative;
-min-width: 80px;
-width: 80px;
-height: 80px;
-margin: 0px;
-margin-top: 10px;
-margin-bottom: 10px;
-padding: 8px;
-object-fit: contain;
-border-radius: 4%;
-}
-
-}
-
-@media screen and (min-width: 1250px) {
-
-.customEntitityLogo {
-background-color: aliceblue;
-position: relative;
-min-width: 100px;
-width: 100px;
-height: 100px;
-margin: 0px;
-margin-top: 10px;
-margin-bottom: 10px;
-padding: 8px;
-object-fit: contain;
-border-radius: 4%;
-}
-
-}
-
-td {
-vertical-align: middle !important;
-}
-</style>
+{{ with $data.basics }}
+<div class="not-prose mb-10 flex flex-col items-center gap-5 text-center sm:flex-row sm:items-start sm:text-left">
+{{ with .image }}
+{{ $localImage := resources.Get (printf "img/%s" (path.Base .)) }}
+{{ if $localImage }}
+{{ $avatar := $localImage.Fill "256x256" }}
+<img src="{{ $avatar.RelPermalink }}" alt="{{ $data.basics.name }}" class="h-28 w-28 flex-none rounded-full object-cover shadow-lg sm:h-32 sm:w-32">
+{{ else }}
+<img src="{{ . }}" alt="{{ $data.basics.name }}" class="h-28 w-28 flex-none rounded-full object-cover shadow-lg sm:h-32 sm:w-32" onerror="this.remove()">
+{{ end }}
+{{ end }}
+<div class="flex-1">
+<p class="mt-0 mb-1 text-3xl font-extrabold text-neutral-900 dark:text-neutral-100">{{ .name }}</p>
+{{ with .label }}
+<p class="mt-0 mb-2 text-lg font-medium text-primary-600 dark:text-primary-400">{{ . }}</p>
+{{ end }}
+{{ with .summary }}
+<p class="mt-0 mb-3 text-neutral-600 dark:text-neutral-300">{{ . }}</p>
+{{ end }}
+<div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-neutral-500 dark:text-neutral-400 sm:justify-start">
+{{ with .location }}
+{{ $parts := slice }}
+{{ with .city }}{{ $parts = $parts | append . }}{{ end }}
+{{ with .region }}{{ $parts = $parts | append . }}{{ end }}
+{{ with .countryCode }}{{ $parts = $parts | append . }}{{ end }}
+{{ $place := delimit $parts ", " }}
+{{ if $place }}
+<span class="inline-flex items-center gap-1 text-base">{{ partial "icon" "location-dot" }} {{ $place }}</span>
+{{ end }}
+{{ end }}
+{{ with .email }}
+<a href="mailto:{{ . }}" class="inline-flex items-center gap-1 text-base hover:text-primary-500">{{ partial "icon" "email" }} {{ . }}</a>
+{{ end }}
+{{ with .phone }}
+<a href="tel:{{ . }}" class="inline-flex items-center gap-1 text-base hover:text-primary-500">{{ partial "icon" "phone" }} {{ . }}</a>
+{{ end }}
+{{ with .url }}
+<a href="{{ . }}" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-base hover:text-primary-500">{{ partial "icon" "globe" }} {{ . | replaceRE "^https?://" "" }}</a>
+{{ end }}
+{{ range .profiles }}
+{{ $icon := .network | anchorize }}
+{{ if not (resources.Get (printf "icons/%s.svg" $icon)) }}{{ $icon = "link" }}{{ end }}
+<a href="{{ .url }}" target="_blank" rel="noopener me" title="{{ .network }}" class="inline-flex items-center gap-1 text-base hover:text-primary-500">{{ partial "icon" $icon }} {{ .network }}</a>
+{{ end }}
+</div>
+</div>
+</div>
+{{ end }}
 
 {{ with $data.work }}
 ## Experience
-<table>
-
-<thead>
-<tr>
-<th></th>
-<th>Company</th>
-<th>Role</th>
-{{ if eq $layout "simple" }}
-<th>Summary</th>
-{{ end }}
-<th>Dates</th>
-</tr>
-</thead>
-
-<tbody>
+<ol class="border-s-2 border-primary-500 dark:border-primary-300 list-none">
 {{ range . }}
-
-<tr>
-<td>
+{{ $logo := "" }}
 {{ if fileExists (printf "content/resume/%s.png" (.name | anchorize)) }}
-<img class="customEntitityLogo" src="{{ .name | anchorize }}.png" alt="{{ .name }}">
+{{ $logo = printf "%s.png" (.name | anchorize) }}
 {{ else }}
-{{ with .img }}
-<img class="customEntitityLogo" src="{{ . }}" alt="{{ .name }}">
+{{ $logo = .img }}
 {{ end }}
+{{ $end := "Present" }}
+{{ with .endDate }}{{ $end = time.Format "Jan 2006" . }}{{ end }}
+{{ partial "jsonresume/timeline-item" (dict
+  "icon" "briefcase"
+  "logo" $logo
+  "title" .name
+  "url" .url
+  "subtitle" .position
+  "dateBadge" (printf "%s – %s" (time.Format "Jan 2006" .startDate) $end)
+  "summary" .summary
+  "tags" .highlights
+) }}
 {{ end }}
-</td>
-
-<td>
-<a href="{{ .url }}" target="_blank">{{ .name }}</a>
-</td>
-
-<td>
-<p>{{ .position }}</p>
-</td>
-
-{{ if eq $layout "simple" }}
-<td>
-{{ with .summary }}
-<p>{{ . }}</p>
-{{ end }}
-{{ range .highlights }}
-<span class="mr-2 rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400" style="white-space: nowrap;">
-{{ . }}
-</span>
-{{ end }}
-</td>
-{{ end }}
-
-<td class="dates" style="max-width:100%; white-space:nowrap;">
-<p>{{ time.Format "Jan 2006" .startDate }}</p>
-<p>&nbsp;-&nbsp;</p>
-{{ with .endDate }}
-<p>{{ time.Format "Jan 2006" . }}</p>
-{{ else }}
-<p><i>Present</i></p>
-{{ end }}
-</td>
-
-</tr>
-{{ end }}
-</tbody>
-</table>
+</ol>
 {{ end }}
 
 {{ with $data.education }}
 ## Education
-<table>
-
-<thead>
-<tr>
-<th></th>
-<th>Institution</th>
-<th>Degree</th>
-<th>Dates</th>
-</tr>
-</thead>
-
-<tbody>
+<ol class="border-s-2 border-primary-500 dark:border-primary-300 list-none">
 {{ range . }}
-
-<tr>
-<td>
+{{ $logo := "" }}
 {{ if fileExists (printf "content/resume/%s.png" (.institution | anchorize)) }}
-<img class="customEntitityLogo" src="{{ .institution | anchorize }}.png" alt="{{ .institution }}">
+{{ $logo = printf "%s.png" (.institution | anchorize) }}
 {{ else }}
-{{ with .img }}
-<img class="customEntitityLogo" src="{{ . }}" alt="{{ .institution }}">
+{{ $logo = .img }}
 {{ end }}
-{{end}}
-</td>
-
-<td style="max-width:100%; white-space:nowrap;">
-<a href="{{ .url }}" target="_blank">{{ .institution }}</a>
-</td>
-
-<td>
-<p>{{ .studyType }} in {{ .area }}</p>
-{{ if eq $layout "simple" }}
-{{ range .courses }}
-<span class="mr-2 rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400" style="white-space: nowrap;">
-{{ . }}
-</span>
+{{ $end := "Present" }}
+{{ with .endDate }}{{ $end = time.Format "Jan 2006" . }}{{ end }}
+{{ partial "jsonresume/timeline-item" (dict
+  "icon" "graduation-cap"
+  "logo" $logo
+  "title" .institution
+  "url" .url
+  "subtitle" (printf "%s in %s" .studyType .area)
+  "dateBadge" (printf "%s – %s" (time.Format "Jan 2006" .startDate) $end)
+  "tags" .courses
+) }}
 {{ end }}
-{{ end }}
-</td>
-
-<td class="dates" style="max-width:100%; white-space:nowrap;">
-<p>{{ time.Format "Jan 2006" .startDate }}</p>
-<p>&nbsp;-&nbsp;</p>
-{{ with .endDate }}
-<p>{{ time.Format "Jan 2006" . }}</p>
-{{ else }}
-<p><i>Present</i></p>
-{{ end }}
-</td>
-
-</tr>
-{{ end }}
-</tbody>
-
-</table>
+</ol>
 {{ end }}
 
 {{ with $data.volunteer }}
 ## Volunteer
-<table>
-
-<thead>
-<tr>
-{{/*  <th></th>  */}}
-<th>Organization</th>
-<th>Position</th>
-{{ if eq $layout "simple" }}
-<th>Summary</th>
-{{ end }}
-<th>Dates</th>
-</tr>
-</thead>
-
-<tbody>
+<ol class="border-s-2 border-primary-500 dark:border-primary-300 list-none">
 {{ range . }}
-
-<tr>
-<td><a href="{{ .url }}" target="_blank">{{ .organization }}</a></td>
-
-<td style="max-width:100%; white-space:nowrap;">{{ .position }}</td>
-
-{{ if eq $layout "simple" }}
-<td>
-{{ with .summary }}
-<p>{{ . }}</p>
-{{ end }}
-{{ range .highlights }}
-<span class="mr-2 rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400" style="white-space: nowrap;">
-{{ . }}
-</span>
-{{ end }}
-</td>
-{{ end }}
-
-<td class="dates" style="max-width:100%; white-space:nowrap;">
-<p>{{ time.Format "Jan 2006" .startDate }}</p>
-<p>&nbsp;-&nbsp;</p>
-{{ with .endDate }}
-<p>{{ time.Format "Jan 2006" . }}</p>
+{{ $logo := "" }}
+{{ if fileExists (printf "content/resume/%s.png" (.organization | anchorize)) }}
+{{ $logo = printf "%s.png" (.organization | anchorize) }}
 {{ else }}
-<p><i>Present</i></p>
+{{ $logo = .img }}
 {{ end }}
-</td>
-
-</tr>
+{{ $end := "Present" }}
+{{ with .endDate }}{{ $end = time.Format "Jan 2006" . }}{{ end }}
+{{ partial "jsonresume/timeline-item" (dict
+  "icon" "heart"
+  "logo" $logo
+  "title" .organization
+  "url" .url
+  "subtitle" .position
+  "dateBadge" (printf "%s – %s" (time.Format "Jan 2006" .startDate) $end)
+  "summary" .summary
+  "tags" .highlights
+) }}
 {{ end }}
-</tbody>
-
-</table>
+</ol>
 {{ end }}
 
 {{ with $data.awards }}
 ## Awards
-<table>
-
-<thead>
-<tr>
-<th>Title</th>
-<th>Awarder</th>
-<th>Summary</th>
-<th>Date</th>
-</tr>
-</thead>
-
-<tbody>
+<ol class="border-s-2 border-primary-500 dark:border-primary-300 list-none">
 {{ range . }}
-
-<tr>
-<td class="dates" style="max-width:100%; white-space:nowrap;"><p>{{ .title }}</p></td>
-
-<td>{{ .awarder }}</td>
-
-<td>{{ .summary }}</td>
-
-<td style="max-width:100%; white-space:nowrap;">
-{{ time.Format "Jan 2006" .date }}
-</td>
-
-</tr>
+{{ partial "jsonresume/timeline-item" (dict
+  "icon" "trophy"
+  "title" .title
+  "subtitle" .awarder
+  "dateBadge" (time.Format "Jan 2006" .date)
+  "summary" .summary
+) }}
 {{ end }}
-</tbody>
+</ol>
+{{ end }}
 
-</table>
+{{ with $data.skills }}
+## Skills
+<div class="not-prose grid gap-4 sm:grid-cols-2">
+{{ range . }}
+<div class="rounded-lg border border-neutral-300 p-4 dark:border-neutral-600">
+<div class="mb-2 flex items-center justify-between gap-2">
+<h3 class="mt-0 mb-0 text-base font-semibold">{{ .name }}</h3>
+{{ with .level }}<span class="rounded-md border border-secondary-400 px-1 py-[1px] text-xs font-normal text-secondary-700 dark:border-secondary-600 dark:text-secondary-400">{{ . }}</span>{{ end }}
+</div>
+<div class="flex flex-wrap gap-2">
+{{ range .keywords }}<span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">{{ . }}</span>{{ end }}
+</div>
+</div>
+{{ end }}
+</div>
+{{ end }}
+
+{{ with $data.languages }}
+## Languages
+<div class="not-prose flex flex-wrap gap-2">
+{{ range . }}<span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">{{ .language }} — {{ .fluency }}</span>{{ end }}
+</div>
 {{ end }}
