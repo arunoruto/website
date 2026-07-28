@@ -1,0 +1,12 @@
+/* GitHub README badges render as block-level <figure> via Blowfish's markdown
+   image render hook, but on GitHub they're plain inline <img> tags that flow
+   in a row. Scoped to .mdimporter (About page only) so post images are unaffected. */
+.mdimporter figure {
+  display: inline-block;
+  margin: 0 0.35rem 0.35rem 0;
+  vertical-align: middle;
+}
+
+.mdimporter figure img {
+  margin: 0;
+}
