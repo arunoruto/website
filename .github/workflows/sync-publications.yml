@@ -14,19 +14,33 @@ on:
 permissions:
   contents: write
 
+# The Monday cron and a manual dispatch can otherwise race to push to main,
+# and the loser fails on a non-fast-forward.
+concurrency:
+  group: sync-publications
+  cancel-in-progress: false
+
 jobs:
   sync:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
+
+      # The script declares its interpreter and dependencies inline (PEP 723),
+      # so uv resolves both from the script itself - no setup-python, no
+      # pip install, no lockfile to keep in sync.
+      - name: Install uv
+        uses: astral-sh/setup-uv@v9
 
       - name: Run sync script
-        run: python3 scripts/sync_publications.py
+        run: uv run scripts/sync_publications.py
 
       - name: Commit and push if changed
         run: |
-          if git diff --quiet -- publications.bib data/publications.json; then
+          set -euo pipefail
+          if git diff --quiet HEAD -- publications.bib data/publications.json; then
             echo "No publication changes."
             exit 0
           fi
@@ -34,4 +48,6 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add publications.bib data/publications.json
           git commit -m "chore(publications): sync from ORCID/Crossref"
+          # Land on top of anything pushed since checkout.
+          git pull --rebase --autostash
           git push

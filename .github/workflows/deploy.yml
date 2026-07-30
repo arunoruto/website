@@ -6,9 +6,38 @@ name: Trigger Cloudflare Pages deploy
 on:
   workflow_dispatch: {}
 
+# Nothing here touches the repo.
+permissions: {}
+
+# Repeated clicks should not fan out into N concurrent deploys.
+concurrency:
+  group: cloudflare-deploy
+  cancel-in-progress: true
+
 jobs:
   deploy-hook:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Call Cloudflare Pages deploy hook
-        run: curl -fsS -X POST "https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/${{ secrets.CLOUDFLARE_DEPLOY_HOOK_ID }}"
+        env:
+          # Kept out of the run: string so it is not interpolated into the
+          # shell command, and out of curl's argv where it would be visible
+          # in the runner's process list.
+          HOOK_ID: ${{ secrets.CLOUDFLARE_DEPLOY_HOOK_ID }}
+        run: |
+          set -euo pipefail
+          if [ -z "$HOOK_ID" ]; then
+            echo "::error::CLOUDFLARE_DEPLOY_HOOK_ID secret is not set." >&2
+            exit 1
+          fi
+          response=$(curl -fsS --retry 3 --retry-connrefused --retry-delay 5 \
+            -X POST \
+            "https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/$HOOK_ID")
+          echo "$response"
+          # A disabled or deleted hook returns HTTP 200 with {"success": false},
+          # which -f does not catch - so the job would go green on a dead hook.
+          echo "$response" | jq -e '.success == true' > /dev/null || {
+            echo "::error::Cloudflare reported failure." >&2
+            exit 1
+          }

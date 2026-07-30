@@ -1,6 +1,20 @@
 version: 2
 updates:
+  # The Blowfish theme. Weekly rather than daily - Dependabot can only bump a
+  # submodule blind, and daily produced runs of back-to-back bumps (#68-#71).
   - package-ecosystem: "gitsubmodule"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+    open-pull-requests-limit: 3
+
+  # Without this, action versions are never bumped at all.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 3
+    groups:
+      actions:
+        patterns:
+          - "*"
