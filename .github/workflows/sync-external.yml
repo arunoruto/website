@@ -1,0 +1,80 @@
+name: Sync external content
+
+# Mirrors the two remote sources the site renders into the repo, so the Hugo
+# build never reaches the network. Same reasoning as sync-publications.yml:
+# a GitHub gist or raw.githubusercontent blip should not be able to fail (or
+# silently blank) a Cloudflare Pages deploy.
+#
+#   resume gist    -> data/resume.json
+#   profile README -> assets/external/github-readme.md
+
+on:
+  schedule:
+    - cron: "30 6 * * 1" # every Monday at 06:30 UTC, after the publications sync
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-external
+  cancel-in-progress: false
+
+env:
+  RESUME_URL: "https://gist.githubusercontent.com/arunoruto/9d8bdf6e325077cff45b79e5f574e6e3/raw/"
+  README_URL: "https://raw.githubusercontent.com/arunoruto/arunoruto/main/README.md"
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Fetch resume gist
+        run: |
+          set -euo pipefail
+          curl -fsS --retry 3 --retry-connrefused --retry-delay 5 \
+            "$RESUME_URL" -o resume.raw.json
+          # Refuse to commit anything that is not parseable JSON with the
+          # sections the shortcode renders - a truncated or error-page
+          # response must not overwrite a good resume.
+          python3 - <<'PY'
+          import json, pathlib, sys
+          data = json.loads(pathlib.Path("resume.raw.json").read_text())
+          if not isinstance(data, dict) or "basics" not in data or "work" not in data:
+              sys.exit("Fetched resume is missing basics/work - refusing to commit.")
+          pathlib.Path("data/resume.json").write_text(
+              json.dumps(data, indent=2, ensure_ascii=False) + "\n"
+          )
+          print(f"resume ok: {len(data.get('work', []))} work entries")
+          PY
+          rm resume.raw.json
+
+      - name: Fetch profile README
+        run: |
+          set -euo pipefail
+          mkdir -p assets/external
+          curl -fsS --retry 3 --retry-connrefused --retry-delay 5 \
+            "$README_URL" -o readme.raw.md
+          # An empty body would blank the About page.
+          if [ ! -s readme.raw.md ]; then
+            echo "::error::Fetched README is empty - refusing to commit." >&2
+            exit 1
+          fi
+          mv readme.raw.md assets/external/github-readme.md
+
+      - name: Commit and push if changed
+        run: |
+          set -euo pipefail
+          if git diff --quiet HEAD -- data/resume.json assets/external/github-readme.md; then
+            echo "No external content changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/resume.json assets/external/github-readme.md
+          git commit -m "chore(content): sync resume and profile README"
+          git pull --rebase --autostash
+          git push

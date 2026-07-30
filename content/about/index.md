@@ -1,5 +1,6 @@
 ---
 title: "About"
+description: "Who I am: a researcher working on planetary remote sensing and machine learning, a climber, and a compulsive tinkerer with Nix and homelabs."
 date: 2022-06-13T20:55:37+01:00
 draft: false
 
@@ -21,4 +22,4 @@ showComments: false
 layoutBackgroundHeaderSpace: false
 ---
 
-{{< mdimporter url="https://raw.githubusercontent.com/arunoruto/arunoruto/main/README.md" >}}
+{{< mdimporter path="external/github-readme.md" >}}

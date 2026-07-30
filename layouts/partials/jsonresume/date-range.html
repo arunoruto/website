@@ -1,0 +1,11 @@
+{{/*  Formats a JSON Resume entry's startDate/endDate into a badge string.
+
+      Takes the entry itself (a dict with optional .startDate / .endDate) and
+      returns e.g. "Jan 2020 – Present", or an empty string if there is no
+      startDate. Both dates are guarded: time.Format errors hard on a missing
+      value, which would fail the whole build over one incomplete entry.  */}}
+{{- $start := "" -}}
+{{- with .startDate }}{{ $start = time.Format "Jan 2006" . }}{{ end -}}
+{{- $end := "Present" -}}
+{{- with .endDate }}{{ $end = time.Format "Jan 2006" . }}{{ end -}}
+{{- if $start }}{{ printf "%s – %s" $start $end }}{{ end -}}

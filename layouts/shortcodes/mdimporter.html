@@ -1,8 +1,9 @@
-{{ $url := .Get "url" }}
-{{ with resources.GetRemote (urls.Parse $url) }}
-  <div class="mdimporter">
-    {{ .Content | markdownify }}
-  </div>
+{{/*  Renders a Markdown file mirrored into assets/ by .github/workflows/sync-external.yml.
+      No network access happens at build time - see that workflow for why.
+      Usage: {{< mdimporter path="external/github-readme.md" >}}  */}}
+{{ $path := .Get "path" }}
+{{ with resources.Get $path }}
+<div class="mdimporter">{{ .Content | markdownify }}</div>
 {{ else }}
-  {{ warnf "mdimporter shortcode: unable to fetch %q: %s" $url .Position }}
+{{ errorf "mdimporter shortcode: no asset at %q (called from %s). Run the sync-external workflow to populate it." $path .Position }}
 {{ end }}

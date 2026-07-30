@@ -1,12 +1,11 @@
 {{/*  Don't indent the document, or else it will think it is a code snippet!  */}}
 {{/*  https://discourse.gohugo.io/t/nested-shortcodes-converting-to-pre-code-blocks/28033  */}}
 
-{{ $url := .Get "url"}}
-{{ $data := "" }}
-{{ with resources.GetRemote (printf $url) }}
-{{ $data = .Content | transform.Unmarshal }}
-{{ else }}
-{{ errorf "Mardown Importer Shortcode - Unable to get remote resource" . }}
+{{/*  Reads data/resume.json, mirrored from the gist by
+      .github/workflows/sync-external.yml - no live network calls happen here.  */}}
+{{ $data := index hugo.Data (.Get "data" | default "resume") }}
+{{ if not $data }}
+{{ errorf "jsonresume shortcode: no data file found (called from %s). Run the sync-external workflow to populate data/resume.json." .Position }}
 {{ end }}
 
 {{ with $data.basics }}
@@ -68,15 +67,14 @@
 {{ else }}
 {{ $logo = .img }}
 {{ end }}
-{{ $end := "Present" }}
-{{ with .endDate }}{{ $end = time.Format "Jan 2006" . }}{{ end }}
+{{ $dateBadge := partial "jsonresume/date-range" . }}
 {{ partial "jsonresume/timeline-item" (dict
   "icon" "briefcase"
   "logo" $logo
   "title" .name
   "url" .url
   "subtitle" .position
-  "dateBadge" (printf "%s – %s" (time.Format "Jan 2006" .startDate) $end)
+  "dateBadge" $dateBadge
   "summary" .summary
   "tags" .highlights
 ) }}
@@ -94,15 +92,17 @@
 {{ else }}
 {{ $logo = .img }}
 {{ end }}
-{{ $end := "Present" }}
-{{ with .endDate }}{{ $end = time.Format "Jan 2006" . }}{{ end }}
+{{ $dateBadge := partial "jsonresume/date-range" . }}
+{{/*  Only build "X in Y" when both halves exist, else it renders "<no value> in <no value>".  */}}
+{{ $subtitle := "" }}
+{{ if and .studyType .area }}{{ $subtitle = printf "%s in %s" .studyType .area }}{{ else }}{{ $subtitle = or .studyType .area }}{{ end }}
 {{ partial "jsonresume/timeline-item" (dict
   "icon" "graduation-cap"
   "logo" $logo
   "title" .institution
   "url" .url
-  "subtitle" (printf "%s in %s" .studyType .area)
-  "dateBadge" (printf "%s – %s" (time.Format "Jan 2006" .startDate) $end)
+  "subtitle" $subtitle
+  "dateBadge" $dateBadge
   "tags" .courses
 ) }}
 {{ end }}
@@ -119,15 +119,14 @@
 {{ else }}
 {{ $logo = .img }}
 {{ end }}
-{{ $end := "Present" }}
-{{ with .endDate }}{{ $end = time.Format "Jan 2006" . }}{{ end }}
+{{ $dateBadge := partial "jsonresume/date-range" . }}
 {{ partial "jsonresume/timeline-item" (dict
   "icon" "heart"
   "logo" $logo
   "title" .organization
   "url" .url
   "subtitle" .position
-  "dateBadge" (printf "%s – %s" (time.Format "Jan 2006" .startDate) $end)
+  "dateBadge" $dateBadge
   "summary" .summary
   "tags" .highlights
 ) }}
@@ -139,11 +138,13 @@
 ## Awards
 <ol class="border-s-2 border-primary-500 dark:border-primary-300 list-none">
 {{ range . }}
+{{ $dateBadge := "" }}
+{{ with .date }}{{ $dateBadge = time.Format "Jan 2006" . }}{{ end }}
 {{ partial "jsonresume/timeline-item" (dict
   "icon" "trophy"
   "title" .title
   "subtitle" .awarder
-  "dateBadge" (time.Format "Jan 2006" .date)
+  "dateBadge" $dateBadge
   "summary" .summary
 ) }}
 {{ end }}
