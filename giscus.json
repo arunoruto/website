@@ -2,7 +2,7 @@
   "origins": [
     "http://localhost:1313",
     "https://www.arnaut.me",
-    "https://blowfish.arnaut.me",
+    "https://blowfish.arnaut.me"
   ],
   "originsRegex": [],
   "defaultCommentOrder": "newest"

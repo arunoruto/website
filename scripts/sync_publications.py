@@ -1,4 +1,11 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#     "bibtexparser~=1.4",
+#     "pylatexenc~=2.10",
+# ]
+# ///
 """Fetch publications from ORCID (+ Crossref for DOI'd entries) and write
 publications.bib and data/publications.json from the same fetch, in one pass.
 
@@ -10,7 +17,9 @@ into a single entry, keyed by a normalized title. The most authoritative
 version (see TYPE_PRIORITY) is kept as the canonical record; any fields it
 is missing are filled in from the duplicate.
 
-Uses only the Python standard library - no pip install required.
+Run with `uv run scripts/sync_publications.py` - the dependencies above are
+declared inline (PEP 723), so there is no requirements.txt or venv to manage
+and uv provisions the interpreter itself.
 """
 from __future__ import annotations
 
@@ -25,6 +34,11 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 from typing import Any
+
+import bibtexparser
+from bibtexparser.bibdatabase import BibDatabase
+from bibtexparser.bwriter import BibTexWriter
+from pylatexenc.latexencode import unicode_to_latex
 
 ORCID_ID = os.environ.get("ORCID_ID", "0000-0002-1631-7083")
 CONTACT = "website-publications-sync (https://arnaut.me; mailto:mirza.arnaut@tu-dortmund.de)"
@@ -51,6 +65,27 @@ CATEGORY = {
     "conference-abstract": "conference",
 }
 VENUE_FIELD = {"article": "journal", "inproceedings": "booktitle", "techreport": "institution"}
+
+# Machine identifiers, not prose: biblatex wants these verbatim, so they skip
+# unicode_to_latex (which would turn a "_" in a URL into "\_"). Only the two
+# characters that genuinely break BibTeX parsing inside a braced field are
+# escaped - "%" in particular starts a comment and would eat the rest of the entry.
+VERBATIM_FIELDS = {"doi", "url"}
+
+# Acronyms bib styles would otherwise lowercase in a title. Applied only to
+# titles, and only *after* unicode_to_latex, which escapes braces
+# ("{DoLP}" -> "\{DoLP\}") and would destroy the protection if run second.
+PROTECTED_ACRONYMS = (
+    "DoLP", "AoLP", "PCA", "MSTM5", "DDSCAT", "BVRI", "UBVRI", "LRO", "WAC",
+    "NEA", "NEAs", "MAE", "RSA", "VLA", "DoI",
+)
+
+# Emitted in this order; anything not listed here is dropped by BibTexWriter.
+FIELD_ORDER = (
+    "title", "author", "year", "month", "journal", "booktitle", "institution",
+    "note", "publisher", "doi", "url", "citations", "abstract", "orcidtype",
+    "orcidputcode",
+)
 
 
 def log(message: str) -> None:
@@ -199,39 +234,60 @@ def assign_citekeys(entries: list[dict[str, Any]]) -> None:
         entry["citekey"] = base if count == 0 else f"{base}{count}"
 
 
-def escape_bib(value: str) -> str:
-    return value.replace("{", "").replace("}", "")
+def protect_acronyms(value: str) -> str:
+    for acronym in PROTECTED_ACRONYMS:
+        value = re.sub(
+            rf"(?<![A-Za-z0-9]){re.escape(acronym)}(?![A-Za-z0-9])", f"{{{acronym}}}", value
+        )
+    return value
+
+
+def encode_field(name: str, value: Any) -> str:
+    """Render one field value as LaTeX-safe BibTeX.
+
+    Prose fields go through pylatexenc, which handles both the specials that
+    break parsing ("&" -> "\\&", "%" -> "\\%") and the non-ASCII that breaks
+    pdflatex ("micro" -> "\\ensuremath{\\mu}", "o-umlaut" -> '\\"o').
+    """
+    text = str(value)
+    if name in VERBATIM_FIELDS:
+        return text.replace("%", r"\%").replace("#", r"\#")
+    text = unicode_to_latex(text)
+    return protect_acronyms(text) if name == "title" else text
 
 
 def to_bibtex(entries: list[dict[str, Any]]) -> str:
-    blocks = []
+    database = BibDatabase()
     for entry in entries:
-        lines = [f"@{entry['bibType']}{{{entry['citekey']},", f"  title = {{{escape_bib(entry['title'])}}},"]
+        record: dict[str, str] = {
+            "ENTRYTYPE": entry["bibType"],
+            "ID": entry["citekey"],
+            "title": encode_field("title", entry["title"]),
+            "orcidtype": encode_field("orcidtype", entry["orcidType"]),
+        }
         if entry["authors"]:
-            lines.append(f"  author = {{{' and '.join(escape_bib(a) for a in entry['authors'])}}},")
-        if entry.get("year"):
-            lines.append(f"  year = {{{entry['year']}}},")
-        if entry.get("month"):
-            lines.append(f"  month = {{{entry['month']}}},")
+            record["author"] = " and ".join(encode_field("author", a) for a in entry["authors"])
         if entry.get("venue"):
-            field = VENUE_FIELD.get(entry["bibType"], "note")
-            lines.append(f"  {field} = {{{escape_bib(entry['venue'])}}},")
-        if entry.get("publisher"):
-            lines.append(f"  publisher = {{{escape_bib(entry['publisher'])}}},")
-        if entry.get("doi"):
-            lines.append(f"  doi = {{{entry['doi']}}},")
-        if entry.get("url"):
-            lines.append(f"  url = {{{entry['url']}}},")
-        if entry.get("citations"):
-            lines.append(f"  citations = {{{entry['citations']}}},")
-        if entry.get("abstract"):
-            lines.append(f"  abstract = {{{escape_bib(entry['abstract'])}}},")
-        lines.append(f"  orcidtype = {{{entry['orcidType']}}},")
-        if entry.get("orcidPutCode"):
-            lines.append(f"  orcidputcode = {{{entry['orcidPutCode']}}},")
-        lines.append("}\n")
-        blocks.append("\n".join(lines))
-    return "\n".join(blocks) + "\n"
+            record[VENUE_FIELD.get(entry["bibType"], "note")] = encode_field("venue", entry["venue"])
+        for source, field in (
+            ("year", "year"),
+            ("month", "month"),
+            ("publisher", "publisher"),
+            ("doi", "doi"),
+            ("url", "url"),
+            ("citations", "citations"),
+            ("abstract", "abstract"),
+            ("orcidPutCode", "orcidputcode"),
+        ):
+            if entry.get(source):
+                record[field] = encode_field(field, entry[source])
+        database.entries.append(record)
+
+    writer = BibTexWriter()
+    writer.indent = "  "
+    writer.display_order = FIELD_ORDER
+    writer.order_entries_by = None  # preserve the year-sorted order from main()
+    return bibtexparser.dumps(database, writer)
 
 
 def main() -> None:
