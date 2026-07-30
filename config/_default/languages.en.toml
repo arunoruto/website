@@ -11,7 +11,9 @@ title = "Arnaut"
   logo = "img/mirza-logo-white-small.png"
   secondaryLogo = "img/mirza-logo-black-small.png"
   description = "Arnaut's personal website"
-  images = ['img/circle-space.jpg']
+  # Site-level `images` takes a raw path and bypasses Hugo's image pipeline, so
+  # this file is served verbatim - keep it pre-sized to 1200x630 for Open Graph.
+  images = ['img/social-card.jpg']
   copyright = "&copy; { year } [Mirza Arnaut](https://github.com/arunoruto/website)"
 
 [params.author]
