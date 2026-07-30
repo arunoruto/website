@@ -7,13 +7,8 @@
         data-category-id="{{ site.Params.comments.giscus.category_id }}"
         data-mapping="{{ site.Params.comments.giscus.mapping }}"
         data-reactions-enabled="{{ site.Params.comments.giscus.reactions_enabled }}"
-        {{ with resources.Get "css/giscus.css" }}
-        {{ with . | toCSS  | minify }}
-        data-theme="{{ .Permalink }}"
-        {{ end }}
-        {{ else }}
         data-theme="{{ site.Params.comments.giscus.theme }}"
-        {{ end }}
+        data-loading="lazy"
         crossorigin="anonymous"
         async>
 </script>

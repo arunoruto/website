@@ -20,11 +20,8 @@ hugo.linux
 devenv.local.nix
 devenv.local.yaml
 
-# direnv
-.direnv
-
-# pre-commit
-.pre-commit-config.yaml
+# Editor/tool backups - git is the backup
+*.bak
 
 # Python
 __pycache__/
