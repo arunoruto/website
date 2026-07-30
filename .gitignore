@@ -15,11 +15,6 @@ hugo.linux
 # direnv
 .direnv
 
-# Devenv
-.devenv*
-devenv.local.nix
-devenv.local.yaml
-
 # Editor/tool backups - git is the backup
 *.bak
 
