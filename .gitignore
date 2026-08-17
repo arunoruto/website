@@ -21,3 +21,7 @@ hugo.linux
 # Python
 __pycache__/
 *.pyc
+
+# Claude Code - per-machine overrides and runtime state, not shared config
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
