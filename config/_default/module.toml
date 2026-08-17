@@ -1,3 +1,6 @@
 [hugoVersion]
-  extended = false
-  min = "0.87.0"
+  # Blowfish v3 needs the extended edition and declares min 0.162.0 / max 0.165.0
+  # in the theme's own config.toml. Only the floor is repeated here so a new Hugo
+  # release does not fail the build on a ceiling this site never set itself.
+  extended = true
+  min = "0.162.0"

@@ -80,6 +80,9 @@ survive a re-sync.
 ## 🚢 Deployment
 
 Cloudflare Pages builds from the Git integration on every push to `main`; the build command and
-`HUGO_VERSION` live in the Cloudflare dashboard, not in this repository.
+`HUGO_VERSION` live in the Cloudflare dashboard, not in this repository. Blowfish v3 needs the
+**extended** edition and declares a supported window of `0.162.0`–`0.165.0` in the theme's
+`config.toml`, so `HUGO_VERSION` has to stay inside it — `config/_default/module.toml` repeats only
+the floor, to avoid failing the build the day a newer Hugo ships.
 [`deploy.yml`](.github/workflows/deploy.yml) is a manual re-trigger for rebuilding without a new
 commit, e.g. after a theme bump.
