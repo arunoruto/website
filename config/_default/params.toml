@@ -42,7 +42,8 @@ giteaDefaultServer = "https://git.fsfe.org"
 forgejoDefaultServer = "https://v11.next.forgejo.org"
 
 [header]
-layout = "fixed" # valid options: basic, fixed, fixed-fill, fixed-gradient, fixed-fill-blur
+layout = "floating"          # valid options: basic, fixed, fixed-fill, fixed-gradient, fixed-fill-blur, floating
+mobileMenuStyle = "dropdown" # valid options: fullscreen, dropdown
 
 [footer]
 showMenu = true
@@ -52,7 +53,9 @@ showAppearanceSwitcher = true
 showScrollToTop = true
 
 [homepage]
-layout = "background"                             # valid options: page, profile, hero, card, background, custom
+layout = "background"  # valid options: page, profile, hero, card, background, landing, custom
+layoutSwitcher = false # renders every layout as a preview - demo only, never in production
+# Used by the background, hero, card, and landing layouts.
 homepageImage = "/img/background/alps-stars.webp"
 showRecent = true
 showRecentItems = 6
@@ -60,8 +63,8 @@ showMoreLink = true
 showMoreLinkDest = "/posts"
 cardView = true
 cardViewScreenWidth = false
-layoutBackgroundBlur = true    # only used when layout equals background
-disableHeroImageFilter = false # only used when layout equals hero
+layoutBackgroundBlur = true                       # only used when layout equals background
+disableHeroImageFilter = false                    # only used when layout equals hero
 
 [article]
 showDate = true
@@ -86,6 +89,7 @@ showHeadingAnchors = true
 showPagination = true
 invertPagination = false
 showReadingTime = true
+showReadingProgress = true
 showTableOfContents = true
 # showRelatedContent = false
 # relatedContentLimit = 3
@@ -98,6 +102,7 @@ showZenMode = false
 
 [list]
 showHero = true
+featureImageHover = true           # subtle zoom on card thumbnails on hover
 heroStyle = "background"           # valid options: basic, big, background, thumbAndBackground
 layoutBackgroundBlur = true        # only used when heroStyle equals background or thumbAndBackground
 layoutBackgroundHeaderSpace = true # only used when heroStyle equals background
