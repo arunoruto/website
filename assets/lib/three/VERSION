@@ -1,0 +1,12 @@
+three.js 0.185.1 (r185), vendored unmodified from https://cdn.jsdelivr.net/npm/three@0.185.1/
+
+  build/three.module.min.js               -> three.module.min.js  (imports ./three.core.min.js)
+  build/three.core.min.js                 -> three.core.min.js
+  examples/jsm/controls/OrbitControls.js  -> OrbitControls.js     (imports bare "three")
+  LICENSE                                 -> LICENSE
+
+Nothing here is edited by hand. Widget bundles (layouts/shortcodes/viz.html) keep the
+bare "three" specifier external and layouts/partials/extend-head-uncached.html maps it
+to these files with an import map, rewriting the ./three.core.min.js import to the
+fingerprinted URL at build time. To upgrade, re-run the four downloads at the new
+version and bump this file.
