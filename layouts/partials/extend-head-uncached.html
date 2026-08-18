@@ -1,0 +1,61 @@
+{{/*  Page-aware head additions (Blowfish calls this partial uncached, with the page
+      as context, right after its own head content).
+
+      Interactive figures: widget bundles built by layouts/shortcodes/viz.html keep
+      `import … from "three"` external, and this import map points the bare
+      specifier at the vendored copy in assets/lib/three/. That way N widgets on a
+      page share one three.js download (and one module instance) instead of each
+      bundling its own ~750 KB. three.module.min.js loads ./three.core.min.js by
+      relative path, so that import is rewritten to the fingerprinted core URL
+      before the module itself is fingerprinted - both stay cache-safe across
+      upgrades. See assets/lib/three/VERSION.  */}}
+{{- if .HasShortcode "viz" -}}
+  {{- $alg := site.Params.fingerprintAlgorithm | default "sha512" -}}
+  {{- $core := resources.Get "lib/three/three.core.min.js" | resources.Fingerprint $alg -}}
+  {{- $moduleRaw := resources.Get "lib/three/three.module.min.js" -}}
+  {{- $module := resources.FromString "lib/three/three.module.min.js" (replace $moduleRaw.Content "./three.core.min.js" $core.RelPermalink) | resources.Fingerprint $alg -}}
+  {{- $importmap := dict
+    "imports" (dict "three" $module.RelPermalink)
+    "integrity" (dict $module.RelPermalink $module.Data.Integrity $core.RelPermalink $core.Data.Integrity)
+  -}}
+  <script type="importmap">{{ $importmap | jsonify | safeHTML }}</script>
+  <link rel="modulepreload" href="{{ $module.RelPermalink }}" integrity="{{ $module.Data.Integrity }}" crossorigin="anonymous">
+  <link rel="modulepreload" href="{{ $core.RelPermalink }}" integrity="{{ $core.Data.Integrity }}" crossorigin="anonymous">
+{{- end -}}
+
+{{/*  KaTeX auto-render fallback. Blowfish v3 appends js/katex-render.js to
+      js/main.bundle.js only when the page has {{< katex >}}, but resources.Concat
+      caches by target path alone, so whichever page happens to build first decides
+      the bundle for every page - and math silently stays raw on the others. This
+      re-runs the same call the theme intends; running it twice is harmless.  */}}
+{{- if .HasShortcode "katex" -}}
+  <script>
+    (function () {
+      var render = function () {
+        if (typeof renderMathInElement === "function") renderMathInElement(document.body);
+      };
+      var ready = function () {
+        var lib = document.getElementById("katex-render");
+        if (typeof renderMathInElement === "function") render();
+        else if (lib) lib.addEventListener("load", render);
+      };
+      if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", ready);
+      else ready();
+    })();
+  </script>
+{{- end -}}
+
+{{/*  wideLayout: true (front matter) loosens Blowfish's prose column for pages
+      that are mostly figures — wider body, less side padding, ~90ch text — while
+      leaving every other page untouched. Only kicks in at lg and above; phones
+      and tablets keep the theme's layout. The wide-figure gutter pull shrinks to
+      match the smaller padding.  */}}
+{{- if .Params.wideLayout -}}
+  <style>
+    @media (min-width: 1024px) {
+      body { max-width: 90rem; padding-left: 4rem !important; padding-right: 4rem !important; }
+      .max-w-prose { max-width: 90ch !important; }
+      .viz--wide { --viz-pull: max(0rem, min(3rem, calc((100vw - 90rem) / 2 + 3rem))); }
+    }
+  </style>
+{{- end -}}

@@ -5,6 +5,15 @@
 [goldmark.renderer]
   unsafe = true
 
+# Hand math straight to KaTeX (pages opt in with {{< katex >}}). Without this,
+# Goldmark treats `_` inside $$…$$ as emphasis and `\(` loses its backslash, so
+# anything beyond a trivial formula renders as garbage.
+[goldmark.extensions.passthrough]
+  enable = true
+  [goldmark.extensions.passthrough.delimiters]
+    block = [['\[', '\]'], ['$$', '$$']]
+    inline = [['\(', '\)']]
+
 [highlight]
   noClasses = false
 

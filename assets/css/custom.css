@@ -10,3 +10,257 @@
 .mdimporter figure img {
   margin: 0;
 }
+
+/* Interactive figures rendered by layouts/shortcodes/viz.html and driven by
+   assets/js/viz/. Colours come from the Blowfish scheme's RGB-triplet variables
+   so widgets follow the appearance switcher without any extra dark: rules. */
+.viz {
+  margin: 2rem 0;
+}
+
+.viz__stage {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  background: rgba(var(--color-neutral-100), 1);
+  touch-action: none; /* drag rotates the scene instead of scrolling the page */
+}
+
+.dark .viz__stage {
+  background: rgba(var(--color-neutral-700), 0.6);
+}
+
+.viz__stage canvas,
+.viz__poster {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  border-radius: 0;
+}
+
+.viz__poster {
+  object-fit: contain;
+}
+
+/* Poster is only a placeholder; the widget takes over once mounted. */
+.viz[data-viz-state="ready"] .viz__poster {
+  display: none;
+}
+
+.viz__noscript,
+.viz__error {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: rgba(var(--color-neutral-500), 1);
+}
+
+.viz__controls {
+  display: grid;
+  grid-template-columns: max-content minmax(6rem, 1fr) max-content;
+  align-items: center;
+  column-gap: 0.75rem;
+  row-gap: 0.4rem;
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.viz__controls:empty {
+  display: none;
+}
+
+.viz__control {
+  display: contents;
+}
+
+.viz__label {
+  color: rgba(var(--color-neutral-600), 1);
+  white-space: nowrap;
+}
+
+.dark .viz__label {
+  color: rgba(var(--color-neutral-400), 1);
+}
+
+.viz__value {
+  min-width: 4ch;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8rem;
+}
+
+.viz__control--checkbox input,
+.viz__control--select select {
+  justify-self: start;
+  grid-column: 2 / -1;
+}
+
+.viz__control--range input {
+  width: 100%;
+  margin: 0;
+  accent-color: rgb(var(--color-primary-500));
+}
+
+/* Blowfish bundles @tailwindcss/forms, which replaces the native checkbox
+   (appearance: none) and paints the checked state with currentColor — a
+   hard-coded Tailwind blue — so accent-color alone is ignored. Feed the
+   plugin the scheme's primary via `color`, and its focus ring the same. */
+.viz__control--checkbox input {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  color: rgb(var(--color-primary-500));
+  accent-color: rgb(var(--color-primary-500));
+  --tw-ring-color: rgb(var(--color-primary-500));
+  border-color: rgba(var(--color-neutral-400), 1);
+  background-color: rgba(var(--color-neutral), 1);
+  cursor: pointer;
+}
+
+.viz__control--checkbox input:checked {
+  background-color: currentColor;
+  border-color: transparent;
+}
+
+.dark .viz__control--checkbox input:not(:checked) {
+  border-color: rgba(var(--color-neutral-500), 1);
+  background-color: rgba(var(--color-neutral-800), 1);
+}
+
+.viz__control--select select,
+.viz__control--range input {
+  --tw-ring-color: rgb(var(--color-primary-500));
+}
+
+.viz__control--select select:focus {
+  border-color: rgb(var(--color-primary-500));
+}
+
+.viz__control--select select {
+  padding: 0.15rem 0.4rem;
+  border: 1px solid rgba(var(--color-neutral-300), 1);
+  border-radius: 0.3rem;
+  background: rgba(var(--color-neutral), 1);
+  color: inherit;
+  font: inherit;
+  font-size: 0.85rem;
+}
+
+.dark .viz__control--select select {
+  border-color: rgba(var(--color-neutral-600), 1);
+  background: rgba(var(--color-neutral-800), 1);
+}
+
+.viz__control--readout .viz__value,
+.viz__buttons {
+  grid-column: 2 / -1;
+}
+
+.viz__control--readout .viz__value {
+  text-align: left;
+}
+
+.viz__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.viz__button {
+  padding: 0.1rem 0.55rem;
+  border: 1px solid rgba(var(--color-neutral-300), 1);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: background-color 120ms, border-color 120ms;
+}
+
+.dark .viz__button {
+  border-color: rgba(var(--color-neutral-600), 1);
+}
+
+.viz__button:hover {
+  border-color: rgb(var(--color-primary-500));
+}
+
+.viz__button.is-active {
+  border-color: rgb(var(--color-primary-500));
+  background: rgba(var(--color-primary-500), 0.15);
+}
+
+/* controls="right": stage and a stacked panel side by side once there is room.
+   Labels take a full row so the narrow column never wraps values. */
+@media (min-width: 768px) {
+  .viz--controls-right {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 13rem;
+    column-gap: 1rem;
+    align-items: start;
+  }
+
+  .viz--controls-right .viz__controls {
+    grid-template-columns: minmax(0, 1fr) max-content;
+    row-gap: 0.25rem;
+    margin-top: 0;
+  }
+
+  .viz--controls-right .viz__control--range .viz__label,
+  .viz--controls-right .viz__control--buttons .viz__label,
+  .viz--controls-right .viz__control--readout .viz__label,
+  .viz--controls-right .viz__control--select .viz__label {
+    grid-column: 1 / -1;
+    margin-top: 0.35rem;
+  }
+
+  .viz--controls-right .viz__control--range .viz__value {
+    grid-column: 2;
+  }
+
+  .viz--controls-right .viz__control--checkbox input {
+    grid-column: 2;
+    justify-self: end;
+  }
+
+  .viz--controls-right .viz__buttons,
+  .viz--controls-right .viz__control--readout .viz__value,
+  .viz--controls-right .viz__control--select select {
+    grid-column: 1 / -1;
+  }
+
+  /* A live readout that wraps would resize the panel every frame while sweeping. */
+  .viz--controls-right .viz__control--readout .viz__value {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .viz--controls-right figcaption {
+    grid-column: 1 / -1;
+  }
+}
+
+/* wide="true": the article column is max-w-prose with the TOC to its right on
+   large screens, so extra room can only be borrowed from the left gutter. The
+   body has 8rem side padding at lg (baseof.html) and centres itself past 80rem;
+   the pull grows with that spare space and is clamped at 0 when there is none. */
+@media (min-width: 1024px) {
+  .viz--wide {
+    --viz-pull: max(0rem, min(7rem, calc((100vw - 80rem) / 2 + 7rem)));
+    width: calc(100% + var(--viz-pull));
+    margin-left: calc(-1 * var(--viz-pull));
+  }
+}

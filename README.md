@@ -77,6 +77,58 @@ The script declares its interpreter and dependencies inline
 install first. Note that it fully regenerates both files; hand edits to `publications.bib` will not
 survive a re-sync.
 
+## 🎛️ Interactive figures
+
+Math posts embed live figures (sliders, drag-to-rotate scenes) through a small in-repo runtime — no
+node toolchain involved, Hugo's built-in esbuild bundles everything.
+
+```
+assets/js/viz/core/       runtime: mount.js (lifecycle), controls.js (sliders/buttons/readouts),
+                          theme.js (Blowfish colours + dark mode), motion.js (frame loop, reduced
+                          motion), three-scene.js (three.js boilerplate)
+assets/js/viz/lib/        shared between widgets: golden.js (γ maths + dial rows),
+                          sphere-points.js (placement recipes + spacing statistics),
+                          point-sphere.js (three.js point cloud on a shell)
+assets/js/viz/widgets/    one ES module per widget — Canvas 2D: fibonacci-spiral,
+                          circle-gaps, sphere-quality; three.js: fibonacci-sphere,
+                          sphere-sampling
+assets/lib/three/         vendored three.js (see VERSION there; nothing is fetched from a CDN)
+layouts/shortcodes/viz.html            the {{< viz >}} shortcode
+layouts/partials/extend-head-uncached.html  import map for "three" + KaTeX render fallback
+content/lab/viz/          draft-only playground that mounts every widget
+```
+
+Use a widget in a post:
+
+```md
+{{< viz widget="fibonacci-sphere" wide="true" params=`{"n": 800}` >}}
+Caption in **Markdown**, KaTeX allowed.
+{{< /viz >}}
+```
+
+Options: `params` (JSON handed to the widget), `id`, `height` (`16/10` aspect or a pixel number),
+`poster` (page-resource image shown until the widget mounts), `wide` (borrow the left gutter on
+large screens), `controls` (`below` | `right` | `none`), `eager` (skip lazy mounting). Quote JSON
+with backticks — Hugo does not support single-quoted shortcode arguments.
+
+Add a widget: create `assets/js/viz/widgets/<name>.js` exporting
+`mount(root, params, ctx) → { destroy?, setTheme? }` and ending with `register("<name>", mount)`;
+build controls with `buildControls(ctx.controlsEl, spec, onChange)`; for 3D use
+`makeScene(ctx, opts)`. Colours come from `ctx.theme` so dark mode works for free. Then add a
+section to `content/lab/viz/index.md` — `serve` builds drafts, `hugo --minify` does not, so the lab
+never ships.
+
+Third-party JS is vendored under `assets/lib/<name>/` next to its `LICENSE` and a `VERSION` note,
+mirroring how Blowfish ships KaTeX and Mermaid. `import … from "three"` stays a bare specifier: the
+widget bundle marks it external and the import map in `extend-head-uncached.html` resolves it, so
+several 3D figures on one page share a single three.js download.
+
+Wide pages: `wideLayout: true` in a post's front matter loosens the prose column on large screens
+(wider body, less side padding, ~90ch text) — for figure-heavy posts; other pages are untouched.
+
+Math: drop `{{< katex >}}` into the post once; `\(…\)` inline and `$$…$$` blocks work
+(`config/_default/markup.toml` enables Goldmark passthrough so Markdown leaves the TeX alone).
+
 ## 🚢 Deployment
 
 Cloudflare Pages builds from the Git integration on every push to `main`; the build command and

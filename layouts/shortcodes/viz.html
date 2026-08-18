@@ -1,0 +1,93 @@
+{{/*  Interactive figure. Mounts the widget assets/js/viz/widgets/<widget>.js into a
+      <figure> and loads that widget's bundle (built by Hugo's esbuild, no node
+      needed) exactly once per page. See assets/js/viz/core/mount.js for the widget
+      contract and README.md "Interactive figures" for the authoring guide.
+
+      Usage:
+        {{< viz widget="fibonacci-sphere" params=`{"n": 800}` >}}
+        Caption in **Markdown**.
+        {{< /viz >}}
+
+      Params:
+        widget   required, basename of assets/js/viz/widgets/<widget>.js
+        params   JSON object handed to the widget as its second argument
+        id       anchor id for the figure
+        height   "16/10" style aspect ratio (default) or a pixel number
+        poster   page-resource image shown until the widget mounts / without JS
+        wide     "true" lets the figure grow past prose width on large screens
+        controls "below" (default), "right" or "none"
+        eager    "true" mounts immediately instead of when scrolled into view  */}}
+{{- $widget := .Get "widget" -}}
+{{- if not $widget -}}
+  {{- errorf "viz shortcode: widget is required (%s)" .Position -}}
+{{- end -}}
+{{- $entry := printf "js/viz/widgets/%s.js" $widget -}}
+{{- $src := resources.Get $entry -}}
+{{- if not $src -}}
+  {{- errorf "viz shortcode: no widget at assets/%s (called from %s)" $entry .Position -}}
+{{- end -}}
+
+{{- $params := .Get "params" | default "{}" -}}
+{{- $parsed := transform.Unmarshal $params -}}{{/* fails the build on malformed JSON */}}
+{{- if not (reflect.IsMap $parsed) -}}
+  {{- errorf "viz shortcode: params must be a JSON object, got %q (%s)" $params .Position -}}
+{{- end -}}
+
+{{- $height := .Get "height" | default "16/10" -}}
+{{- $stageStyle := "" -}}
+{{- if findRE "^\\d+\\s*/\\s*\\d+$" $height -}}
+  {{- $stageStyle = printf "aspect-ratio: %s;" (replace $height " " "") -}}
+{{- else if findRE "^\\d+$" $height -}}
+  {{- $stageStyle = printf "height: %spx;" $height -}}
+{{- else -}}
+  {{- errorf "viz shortcode: height must be an aspect ratio like 16/10 or a pixel number, got %q (%s)" $height .Position -}}
+{{- end -}}
+
+{{- $poster := "" -}}
+{{- with .Get "poster" -}}
+  {{- with $.Page.Resources.GetMatch . -}}
+    {{- $poster = .RelPermalink -}}
+  {{- else -}}
+    {{- warnf "viz shortcode: poster %q not found among page resources (%s)" . $.Position -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $truthy := slice "true" "1" "yes" "on" -}}
+{{- $wide := in $truthy (lower (.Get "wide" | default "false")) -}}
+{{- $eager := in $truthy (lower (.Get "eager" | default "false")) -}}
+{{- $controls := lower (.Get "controls" | default "below") -}}
+{{- if not (in (slice "below" "right" "none") $controls) -}}
+  {{- errorf "viz shortcode: controls must be below, right or none, got %q (%s)" $controls .Position -}}
+{{- end -}}
+
+{{/* "three" stays a bare import: layouts/partials/extend-head-uncached.html maps it
+     to the vendored copy with an import map, so widgets share one download. */}}
+{{- $opts := dict
+  "format" "esm"
+  "target" "es2020"
+  "minify" hugo.IsProduction
+  "sourceMap" (cond hugo.IsProduction "" "inline")
+  "externals" (slice "three")
+-}}
+{{- $js := $src | js.Build $opts | resources.Fingerprint (site.Params.fingerprintAlgorithm | default "sha512") -}}
+
+<figure
+  class="viz{{ if $wide }} viz--wide{{ end }} viz--controls-{{ $controls }}"
+  data-viz-widget="{{ $widget }}"
+  data-viz-params="{{ $params }}"
+  {{- with .Get "id" }} id="{{ . }}"{{ end -}}
+  {{- if $eager }} data-viz-eager{{ end }}>
+  <div class="viz__stage" style="{{ $stageStyle | safeCSS }}">
+    {{- with $poster }}
+      <img class="viz__poster" src="{{ . }}" alt="" loading="lazy" decoding="async">
+    {{- end }}
+    <noscript><p class="viz__noscript">This figure is interactive and needs JavaScript.</p></noscript>
+  </div>
+  {{- if ne $controls "none" }}
+  <div class="viz__controls"></div>
+  {{- end }}
+  {{- with .Inner }}
+  <figcaption>{{ . | $.Page.RenderString }}</figcaption>
+  {{- end }}
+</figure>
+<script type="module" src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" crossorigin="anonymous"></script>
