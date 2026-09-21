@@ -1,7 +1,17 @@
 version: 2
 updates:
-  # The Blowfish theme. Weekly rather than daily - Dependabot can only bump a
-  # submodule blind, and daily produced runs of back-to-back bumps (#68-#71).
+  # The Blowfish theme. Bumps land on tagged releases, not arbitrary commits:
+  # dependabot/dependabot-core#13052 (merged 2026-02-17) taught the gitsubmodule
+  # ecosystem to prefer semver tags over untagged commits. GitHub's docs describe
+  # neither the old behaviour nor the new one, so that PR is the reference.
+  #
+  # PR titles still read as SHA-to-SHA because gitsubmodule has no version string
+  # to render; resolve one with `git -C themes/blowfish describe --tags <sha>`.
+  #
+  # Weekly rather than daily is a leftover from the old behaviour, when daily
+  # churned through superseded PRs (#59 and #61-#63 all reopened off the same
+  # base). Every bump since #64 has landed on a release tag, so the interval now
+  # only decides how soon a new release is noticed.
   - package-ecosystem: "gitsubmodule"
     directory: "/"
     schedule:
