@@ -61,7 +61,7 @@ being up, or an ORCID hiccup could fail a deploy — or worse, silently blank a 
 
 | Source | Lands in | Workflow |
 | --- | --- | --- |
-| ORCID + Crossref | `publications.bib`, `data/publications.json` | [`sync-publications.yml`](.github/workflows/sync-publications.yml) |
+| Google Scholar + ORCID + Crossref | `data/publications.json`, `data/publications.bib`, `data/scholar.json` | [`sync-publications.yml`](.github/workflows/sync-publications.yml) |
 | Resume gist | `data/resume.json` | [`sync-external.yml`](.github/workflows/sync-external.yml) |
 | GitHub profile README | `assets/external/github-readme.md` | [`sync-external.yml`](.github/workflows/sync-external.yml) |
 
@@ -74,8 +74,23 @@ uv run scripts/sync_publications.py
 
 The script declares its interpreter and dependencies inline
 ([PEP 723](https://peps.python.org/pep-0723/)), so `uv` provisions everything itself — nothing to
-install first. Note that it fully regenerates both files; hand edits to `publications.bib` will not
-survive a re-sync.
+install first. Note that it fully regenerates its outputs; hand edits to `data/publications.bib` will
+not survive a re-sync.
+
+The Google Scholar profile decides *which* publications appear — curate and merge there (ORCID
+records of the last 12 months are listed even before Scholar has indexed them). Scholar
+has no official API and exposes no DOIs, so the profile is read through
+[SerpApi](https://serpapi.com/google-scholar-author-api) and each article is then matched by title
+against ORCID and Crossref for its DOI, work type, full author list and abstract. The script needs
+`GOOGLE_SCHOLAR_ID` and `SERPAPI_KEY`: repository secrets in CI, a gitignored `.env` (loaded by
+direnv) locally. `data/publications.json` is the site's own platform-independent record — and the cache the next run
+starts from: content fields, `ids` (DOI, Scholar, ORCID put-code), `links` (every known page of the
+work, ready to be linked) and `sync` (the script's bookkeeping). `data/publications.bib` is a LaTeX
+export of the same data. Entries also get a link to their
+ResearchGate page where a Google `site:` search (again through SerpApi) finds one whose URL carries
+the same title. A weekly run costs one SerpApi search, plus one per new article that neither ORCID
+nor Crossref knows, plus a monthly ResearchGate re-check of each article not found there yet — well
+inside the free tier's 250 searches.
 
 ## 🎛️ Interactive figures
 

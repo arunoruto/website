@@ -9,7 +9,8 @@
   url = {https://doi.org/10.1051/0004-6361/202555905},
   abstract = {Context . Imaging polarimetry enables the spatially resolved investigation of cometary dust properties across different morphological structures. While cometary comae have been studied thoroughly in the pertinent literature, cometary tails have remained less explored. Comparing these regions can reveal differences in the size, structure, and composition of their dust. Aims . The goal of this study is to examine the size, structure and composition of the dust particles in the coma and in particular in the tail of the bright comet C/2023 A3 (Tsuchinshan-ATLAS) and to infer possible differences. Methods . For this purpose, we rely on the method of telescopic wide-field polarimetric imaging of the comet in the visible to nearinfrared domain in order to obtain the dependence of the degree of linear polarization (DoLP) of the coma and tail on the phase angle across a broad range. An off-the-shelf industrial grade polarization camera was used in combination with a telescope of short aperture ratio. These observations are complemented by T-matrix and discrete dipole approximation modeling using the MSTM5 and DDSCAT software framework, respectively, for simulation of light scattering by dust particles of fractal agglomerate and agglomerate debris morphology. Results . Our observations indicate that the coma exhibits a high maximum DoLP of 0.34, which is further exceeded by a factor of about two by the DoLP of the comet{\textquoteright}s tail. Our modeling results suggest a 50:50 olivine-carbon composition. The fraction of agglomerate debris was found to be 50\% in the coma and possibly higher in the tail. The differences between the coma and the tail in the observed maximum DoLP and the phase angle at which it occurs can be explained by a predominance of particles with radii larger than 0.6 \ensuremath{\mu}m in the coma versus smaller sub-micrometer particles close to the Rayleigh limit in the tail, assuming power-law size distributions with exponents of 2 and 5, respectively. Conclusions . Our results are consistent with smaller particles being transported from the coma into the tail more efficiently than larger particles by the solar radiation pressure. The possibly larger agglomerate debris fraction in the tail than in the coma may be a dynamical effect due to the mass difference between porous and compact particles of similar size.},
   orcidtype = {journal-article},
-  orcidputcode = {208099542}
+  orcidputcode = {208099542},
+  scholarid = {BtfJWZkAAAAJ:Se3iqnhoufwC}
 }
 
 @unpublished{arnaut2026disentangling,
@@ -22,7 +23,8 @@
   url = {https://doi.org/10.5194/epsc2026-1062},
   abstract = {. IntroductionThe remote characterization of atmosphereless celestial bodies relies on understanding scattered sunlight. The Degree of Linear Polarization (DoLP) is a sensitive tool for analyzing the physical properties of granular soils [1]. However, interpreting these polarization curves is complicated by two main factors: the difference between opaque surface scattering (e.g., in rocks) and semi-transparent volume scattering (e.g., in glasses) across various wavelengths [2], and the discrepancy between mechanical sieve sizes and true optical scattering behavior [3]. This study investigates the optical behavior of crushed planetary simulants by combining multi-wavelength laboratory polarimetry with Principal Component Analysis (PCA). The goal is to objectively separate how material composition and grain size influence on shape of polarization phase curves.2. Laboratory Measurements and Curve FittingLaboratory polarimetry was conducted on samples of crystalline basalt and amorphous glass. The samples were mechanically separated into three sieve bins (},
   orcidtype = {preprint},
-  orcidputcode = {219486025}
+  orcidputcode = {219486025},
+  scholarid = {BtfJWZkAAAAJ:hqOjcs7Dif8C}
 }
 
 @unpublished{sander2026investigating,
@@ -48,7 +50,8 @@
   url = {https://doi.org/10.5194/epsc-dps2025-1232},
   abstract = {IntroductionThe polarimetric properties of airless Solar System bodies provide invaluable insights into their surface characteristics. While extensively applied to asteroids, often interpreted using empirical models, the Moon {\textendash} our most meticulously studied airless body {\textendash} offers a unique ''ground-truth'' calibrated benchmark. Historical lunar polarimetry established fundamental relationships [1,2,3]. This study focuses on the geologically diverse Atlas crater region, treating its terrains as distinct analogues for asteroid surfaces. We employ a multi-step approach: first, fitting an empirical model typically used for Near-Earth Asteroids (NEAs) to characterize phase curve behavior and extract key parameters; second, applying Principal Component Analysis (PCA) to this set of derived and fitted parameters to identify dominant modes of variation; and third, utilizing machine learning for terrain segmentation based on these PCA components. This work aims to: (1) derive robust polarimetric parameters and identify distinct polarimetric units within Atlas using four spectral bands (B,V,R,I); (2) enhance understanding of how lunar surface properties (e.g., soil maturity, pyroclastic deposits) govern these signatures; and (3) provide a well-constrained calibration dataset for interpreting polarimetric observations of asteroids.2 MethodsSpectropolarimetric observations of the Atlas crater region were acquired in the Johnson-Cousins BVRI filter bands. The instrumentation included a 430mm reflector telescope located at Mount Abu, India, and a 200mm reflector telescope at Wetter, Germany. The camera system employed, as detailed in [4], provided an image scale of approximately 0.9 km/pixel. The data capture the degree of linear polarization (DoLP) as a function of phase angle (\ensuremath{\alpha}) across these four spectral bands.1. Empirical Phase Curve Modeling: We applied the empirical phase-polarization model described for NEAs by Bagnulo et al. [5, Section 2.2, Equation 7]: DoLP(\ensuremath{\alpha})=A{\textperiodcentered} sinB (\ensuremath{\alpha}) {\textperiodcentered} cosC (\ensuremath{\alpha}/2) {\textperiodcentered} sin(\ensuremath{\alpha} \ensuremath{-} \ensuremath{\alpha}inv). This model was fitted to the observed DoLP phase curves for sub-regions within the Atlas study area (example in Fig. 1).Figure 1 (Highland)This yields maps of the fitted model parameters A, B, C, and \ensuremath{\alpha}inv (Fig. 2). From these best-fit curves, features like minimum/maximum polarization (Pmin, Pmax) and their respective phase angles (\ensuremath{\alpha}min, \ensuremath{\alpha}max) were also numerically derived (Fig. 3). Figure 2 Figure 32. Principal Component Analysis (PCA) of Parameters: PCA was subsequently performed on the combined set of these eight parameters (four fitted: A, B, C, \ensuremath{\alpha}inv; and four derived: Pmin, \ensuremath{\alpha}min, Pmax, \ensuremath{\alpha}max) obtained for each pixel across the BVRI bands. This approach reduces the dimensionality of the parameter space and identifies the principal axes of variation in the collective polarimetric response characteristics (Fig. 4).Figure 43. Clustering: Unsupervised machine learning (Gaussian Mixture Model clustering) was applied to the significant PCA components derived from theparameter set. This step segments the Atlas region into distinct units based on similarities in their comprehensive polarimetric parameter signatures (Fig. 5).Figure 53 ResultsThe integrated analysis of the Atlas BVRI spectropolarimetric dataset yields several key findings:1. Empirical Model and Derived Parameter Maps: The spatial maps of the fitted parameters (A,B,C,\ensuremath{\alpha}inv, Fig. 2) and the derived polarimetric features (Pmin,\ensuremath{\alpha}min,Pmax,\ensuremath{\alpha}max, Fig. 3) exhibit apparent variations correlated with known geological units. Notably, higher \ensuremath{\alpha}max values are observed for more mature mare surfaces compared to the fresh ejecta of Atlas crater, consistent with Shkuratov et al. [6] linking higher \ensuremath{\alpha}max to increased soil maturity.2. PCA of Parameter Space: The PCA components map (Fig. 4), derived from the comprehensive set of eight fitted and derived parameters, effectively highlights geological distinctions and interdependencies between these parameters. Different colors in the PCA map correspond to distinct combined polarimetric characterizations.3. Clustering Results: The Gaussian Mixture Model clustering applied to the PCA components of the parameter set (Fig. 5) successfully segments the Atlas region into distinct units. A strong spatial correlation is observed between specific clusters and known pyroclastic deposits, on the floor of the Atlas crater. This indicates that the combined polarimetric parameters captured by PCA are sensitive to such deposits, yielding results for terrain differentiation similar in utility to the direct DoLP analysis in W\"ohler, et al. [4].4. Wavelength Dependencies: All initial parameters demonstrate noticeable dependencies on wavelength across the BVRI bands, which are propagated into the PCA and clustering stages.4 DiscussionThe Atlas region serves as an exceptional natural laboratory. By first parameterizing the phase curve behavior using an empirical model (Figs. 2,3), we distill the polarimetric information into a set of physically meaningful (though empirical) coefficients and features. The subsequent PCA on this parameter space (Fig. 4) identifies the dominant combinations of these characteristics that differentiate lunar terrains. The observed correlation between higher \ensuremath{\alpha}max values and increased soil maturity provides a quantitative lunar benchmark. Critically, the clustering of these PCA-reduced parameters (Fig. 5) demonstrates a powerful capacity to identify and map geological units, the pyroclastic deposits. Although the PCA is applied to a different input dataset than in W\"ohler, et al. [4] (parameters vs. raw DoLP), the ability to distinguish terrains, including pyroclastics, remains robust, suggesting that the information content is well-preserved and effectively summarized by the empirical model parameters.5 ConclusionThis study demonstrates a novel approach by combining empirical phase curve modeling with PCA of the resulting parameter set and subsequent machine learning to analyze BVRI lunar spectropolarimetric data from the Atlas region. We have quantitatively characterized phase curve behavior and identified distinct polarimetric units defined by combinations of these parameters, linking them to geological features and surface properties like soil maturity and pyroclastic deposits. These findings establish the Atlas region as a crucial calibration site for interpreting asteroid polarimetry, and the methodology offers a new avenue for extracting comprehensive insights from polarimetric datasets.[1] Lyot,Ph.D.Thesis,Jan.1929.[2] Dollfus,Planets\&Satellites.Jan.1961,p.343.[3] Shkuratov et al.,PSS59.13(Oct.2011),pp.1326{\textendash}1371.[4] W\"ohler et al., AJ167.5(May2024),p.187.[5] Bagnulo, et al.,A\&A32.1(Dec.2024)[6] Shkuratov et al., Icarus187.2(Apr.2007),pp.406{\textendash}4},
   orcidtype = {preprint},
-  orcidputcode = {187614174}
+  orcidputcode = {187614174},
+  scholarid = {BtfJWZkAAAAJ:UebtZRa9Y70C}
 }
 
 @article{whler2024multiband,
@@ -60,10 +63,12 @@
   publisher = {American Astronomical Society},
   doi = {10.3847/1538-3881/ad2f2f},
   url = {http://dx.doi.org/10.3847/1538-3881/ad2f2f},
-  citations = {4},
+  researchgate = {https://www.researchgate.net/publication/379506392_Multiband_Spectropolarimetry_of_Lunar_Maria_Pyroclastics_Fresh_Craters_and_Swirl_Materials},
+  citations = {9},
   abstract = {Abstract Imaging polarimetry is a well-known method for examining the small-scale structure of the surface regolith of airless celestial bodies. In this study, we examine (for the first time) the wavelength-dependent polarization behavior of selected lunar areas, including maria, highlands, fresh craters, pyroclastic deposits, and the Reiner Gamma swirl, based on telescopic multiband UBVRI imaging polarimetry at phase angles within the range of the positive polarization branch. The terrain-dependent spectropolarimetric behavior is studied for the first time in this work. For each study area, we conduct a mapping of the relative regolith grain size, an analysis of the exponent of the Umov law, and the wavelength dependence of the degree of linear polarization. Furthermore, we perform area-specific principal component analyses of the degree of linear polarization, followed by unsupervised machine learning (clustering) to segment different terrain types. We find that fresh mare craters and high-titanium pyroclastic deposits have an increased regolith grain size, whereas crater ray material, low-titanium pyroclastic material, and the Reiner Gamma swirl are more finely grained than the average regolith. The degree of linear polarization decreases with increasing wavelength-dependent albedo according to a power law whose exponent is itself positively correlated with the albedo. For a constant albedo and grain size, the degree of linear polarization increases linearly with wavelength. The clustering step yields a library of terrain-dependent prototype spectra of the degree and angle of linear polarization.},
   orcidtype = {journal-article},
-  orcidputcode = {167205329}
+  orcidputcode = {167205329},
+  scholarid = {BtfJWZkAAAAJ:W7OEmFMy1HYC}
 }
 
 @inproceedings{bhatt2024lunar,
@@ -73,7 +78,8 @@
   month = {07},
   booktitle = {45th COSPAR Scientific Assembly},
   orcidtype = {conference-paper},
-  orcidputcode = {203610409}
+  orcidputcode = {203610409},
+  scholarid = {BtfJWZkAAAAJ:roLk4NBRz8UC}
 }
 
 @inproceedings{whler2024multiband1,
@@ -83,7 +89,8 @@
   month = {07},
   booktitle = {45th COSPAR Scientific Assembly},
   orcidtype = {conference-paper},
-  orcidputcode = {203610484}
+  orcidputcode = {203610484},
+  scholarid = {BtfJWZkAAAAJ:LkGwnXOMwfcC}
 }
 
 @inproceedings{misra2024comparative,
@@ -92,8 +99,10 @@
   year = {2024},
   month = {03},
   booktitle = {55th Lunar and Planetary Science Conference},
+  citations = {2},
   orcidtype = {conference-paper},
-  orcidputcode = {203610585}
+  orcidputcode = {203610585},
+  scholarid = {BtfJWZkAAAAJ:YsMSGLbcyi4C}
 }
 
 @inproceedings{arnaut2024seeking,
@@ -104,7 +113,8 @@
   booktitle = {AGU Fall Meeting Abstracts},
   url = {https://agu.confex.com/agu/agu24/meetingapp.cgi/Paper/1726008},
   orcidtype = {conference-abstract},
-  orcidputcode = {203610395}
+  orcidputcode = {203610395},
+  scholarid = {BtfJWZkAAAAJ:_FxGoFyzp5QC}
 }
 
 @inproceedings{arnaut2024investigating,
@@ -118,7 +128,8 @@
   url = {https://meetingorganizer.copernicus.org/EPSC2024/EPSC2024-1034.html},
   abstract = {. IntroductionSpectral analysis of reflectance measurements is a well-established method for studying the lunar surface, supported by data from the Moon Mineralogy Mapper (M3) [1]. However, these data only provide partial insights, as focusing solely on intensity overlooks critical information like polarization. Despite the foundational work by Shkuratov and Opanasenko [2], further exploration of the lunar surface's polarimetric properties has been limited. The inclusion of the PolCam on the KPLO [3] promises new data for developing models that enhance our understanding of these properties. Polarization, more sensitive to surface structure than reflectance, helps model grain size distribution [2, 4]. This study aims to broaden the application of polarization to assess its impact in various contexts, focusing on nano-phase iron particles from space weathering [5, 6]. These particles alter the reflectance spectrum, causing darkening, reddening, and absorption feature obstruction, which are essential factors in spectral analysis. We explore how these particles when integrated into olivine, affect parameters like cross-section, albedo, phase function, and linear polarization degree and how their cluster's shape influences these parameters. 2. MethodsOur model requires (1) a cluster of particles and (2) a light-scattering framework. Geometry: A particle cluster is generated using the FracVAL algorithm [7], setting the average particle size to 10nm and standard deviation to \ensuremath{\sigma}r=1.5, with a total of 256 particles. This method employs the fractal dimension to alter the cluster structure; dimensions near 1, 2, and 3 shape the cluster into string-like, layered, and densely packed forms, respectively. Selected dimensions are 1.4, 1.7, 2.0, 2.3, and 2.6. The fractal dimension also acts as a measure of density, with higher values indicating a more compact cluster and smaller bounding box, resulting in increased overall density.Figure 1: Clusters with 256 particles generated with a fractal dimension of 1.4 (top), 2.0 (middle), and 2.6 (bottom). Light Scattering: We employ our light-scattering framework, YASF [8], which utilizes the T-matrix method to model the specified particle configurations. The refractive indices for iron particles[9] and olivine[10] are retrieved from online databases and adjusted to fit a designated wavelength vector. Subsequently, the computed values for the cross-section, albedo, phase function, and degree of linear polarization are archived in compressed Python pickle files, which can be integrated into a dashboard for further analysis. Two distinct dashboard types have been developed:1. It is possible to independently observe particle cluster configurations, displaying all stored information and selecting the angle-dependent dataset from a list: https://arnaut-epsc2024-view.streamlit.app/2. Data sets for comparison can be selected from a list, and the wavelengths of interest can be modified to improve the analysis of data dependent on the phase angle: https://arnaut-epsc2024-compare.streamlit.app/ 3 Results Examining only the wavelength-dependent quantities, the cross-sections and the albedo, there appears to be slight variation among the different cluster types. The cross-sections seem to exhibit a peak at the fractal dimension of 2.3 since both the higher fractal dimension of 2.6 and dimensions smaller than 2.0 result in reduced values. This pattern is also observed in the albedo, yet alterations in the cluster{\textquoteright}s shape do not reveal any new features in the data. Figure 2: Comparison of the cluster types' cross-sections and albedos. This perspective changes when we consider phase angle-dependent quantities, such as the phase function and the degree of linear polarization. The phase function, in particular, shows a high sensitivity to variations in the fractal dimension. As the dimension increases, there is a decrease in multiple scattering, causing the peak to shift from smaller to larger phase angles. This phenomenon is even more pronounced at longer wavelengths. Unfortunately, the phase function cannot be measured directly and must be estimated using models such as the Hapke model [11]. Figure 3: Comparison of the phase function between the cluster types. In contrast, the degree of linear polarization is a measurable quantity [2, 4]. The most notable characteristic is the degree of linear polarization peak, which occurs near 75{\textdegree}. Maintaining a fractal dimension greater than 2 results in fewer particle interactions. This effect is evident in the modeled polarimetric data, where clusters with a higher fractal dimension maintain a consistent maximum across all wavelengths. In contrast, clusters with a lower fractal dimension exhibit two significant changes: a peak position shift and a maximum value reduction. These shifts are particularly noticeable at short wavelengths, where the peak moves toward smaller phase angles, and at long wavelengths, it shifts slightly toward larger phase angles. Figure 4: Comparison of the phase angle dependence of the degree of linear polarization between the cluster types. 4 Conclusion and OutlookChanges in the concentration of iron particles clearly affect the optical characteristics of the cluster. Although these fluctuations cause only slight changes in albedo (similarly derived from reflectance models such as the phase function), they have a more noticeable influence on polarimetric measurements, which are sensitive to the structure of the particles. Specifically, the angle at which the degree of linear polarization reaches its maximum correlates with the concentration of iron particles in the medium, suggesting that this characteristic may indicate space weathering. These findings also coincide with observational findings done by Shkuratov et al. in 2007 [12]. This study serves as an example of the utility of polarimetric data in fields traditionally dominated by reflectance data. The proverb {\textquoteright}there is no data like more data{\textquoteright} holds true, emphasizing that incorporating diverse data sources is crucial for expanding our knowledge of the lunar surface. References[1] R. O. Green, et al. (2011) JGR 116.[2] Y.G. Shkuratov, N.V. Opanasenko (1992) Icarus 99.2 p.468{\textendash}484.[3] C.K. Sim, et al. (2020) PASP 132.1007 015004[4] C. W\"ohler, et al. (2024) AJ p.187.[5] C.M. Pieters, S.K. Noble (2016) JGRP 121.10 pp.1865{\textendash}1884.[6] K.S. Wohlfarth, et al. (2019) AJ 158.2 p.80.[7] J. Mor\'an,et al (2019) CPC 239 pp. 225{\textendash}237.[8] M. Arnaut, et al. (2024) Zenodo 11193988.[9] M.R. Querry (1985) Optical constants.[10] D. Fabian, et al. (2001) A\&A 378.1 pp. 228{\textendash}238.[11] B. Hapke (2012) Cambridge University Press.[12] Y.G. Shkuratov, et al. (2007) Icarus 187.2 pp. 406{\textendash}416.},
   orcidtype = {conference-abstract},
-  orcidputcode = {167205293}
+  orcidputcode = {167205293},
+  scholarid = {BtfJWZkAAAAJ:ufrVoPGSRksC}
 }
 
 @inproceedings{whler2024terraindependent,
@@ -131,7 +142,8 @@
   url = {http://dx.doi.org/10.5194/epsc2024-995},
   abstract = {IntroductionThe polarisation of the sunlight reflected by the surface of the Moon contains information about the structural properties of the surficial regolith layer, such as the grain size and the microscale roughness [1, 2]. The internal structure or layering of regolith grains can be assessed using wavelength-dependent polarisation data [3]. Most of the existing lunar polarisation data were acquired at large phase angles exceeding approximately 23{\textdegree} in the visible wavelength range and were in part linked quantitatively to structural regolith properties based on laboratory experiments [e.g., 1, 2, 3, 4, 5]. At smaller phase angles, in the so-called ``negative polarisation branch'', the lunar polarisation is less well understood, and especially polarisation imaging data of high spatial resolution are scarce [e.g., 6, 7]. In this work, we present first results of a telescopic observation campaign aiming at the acquisition of multispectral (Johnson-Cousins UBVRI) imaging polarimetric data at small phase angles of a variety of typical lunar terrain types, including maria, highlands, pyroclastic deposits and fresh crater materials.Data and MethodsThe dataset analysed in this study was acquired during five nights between February 21st and 26th, 2024, at phase angles between 4{\textdegree} and 30{\textdegree} with a reflector telescope of 430 mm aperture and 3000 mm focal length at Mount Abu Observatory in Rajasthan, India. We used a monochrome the Imaging Source DZK 33UX250 industrial polarisation camera, which is constructed such that the individual sensor pixels are equipped with polarization filters rotated by 0{\textdegree}, 45{\textdegree}, 90{\textdegree} and 135{\textdegree}. In that way, for each 2 by 2 pixels neighbourhood of sensor pixels values for the intensity, degree of polarisation (DoLP) and angle of polarisation (AoLP) can be obtained [8]. The image scale is 0.9 km per pixel, the spectral filter set is Johnson-Cousins UBVRI ranging from the near-ultraviolet throughout the visible range into the near-infrared domain. To obtain a polarisation image, a set of 3500 individual camera frames was acquired, the individual sub-frames corresponding to the four polarization directions were extracted, and the sharpest 10\% of the sub-frames were selected and stacked with the software Autostakkert3 [9]. So far, our analysis is restricted to the DoLP inferred from the stacked images. The telescopic data were georeferenced to the Lunar Reconnaissance Orbiter (LRO) Wide Angle Camera (WAC) mosaic as described in [4, 5], resulting in one image cube per wavelength channel containing the pixel-wise DoLP in dependence on the phase angle. To each pixel of each image cube, a third-degree polynomial with zero intercept was fitted [7], allowing for a computation of the absolute value Pmin of the minimal DoLP, the phase angle \ensuremath{\alpha}min at which the minimum occurs, the phase angle of inversion \ensuremath{\alpha}inv of zero DoLP, and the slope h of the DoLP vs. phase angle curve at \ensuremath{\alpha}inv [7]. The resulting 20 polarisation features were transformed to zero mean and unit standard deviation, and a Principal Component Analysis (PCA) [10] was applied. The small DoLP values in the negative polarisation branch have the effect that only the scores on the first 2-3 principal components are not dominated by noise.Fig. 1: IVU composite of the study area. Colour saturation has been enhanced.Fig. 2: Derived polarisation parameters in the V band.Fig. 3: PCA composite image of the study area.Results and DiscussionOur study area is located between the lunar craters Copernicus and Manilius and comprises the mare regions of Sinus Aestuum and Mare Vaporum, the neighbouring highland terrain, and the well-known regional pyroclastic deposits near Rima Bode, in Sinus Aestuum and in Mare Vaporum [e.g., 11]. For orientation, Fig. 1 depicts an RGB composite consisting of the I, V and U channels. Maps of the polarisation parameters Pmin, \ensuremath{\alpha}min, \ensuremath{\alpha}inv and h in the V band are shown in Fig. 2 and the scores on the first three principal components in Fig. 3.Fig. 2 shows that Pmin and h hardly differ between dark mature maria and brighter neighbouring highlands, but pyroclastic deposits stand out as positive anomalies and fresh craters as negative anomalies. Both parameters are correlated with the grain size inferred in [5] from the DoLP at large phase angles. The value of \ensuremath{\alpha}inv is generally different for maria than for highlands, whereas \ensuremath{\alpha}min shows a weak dependence on the terrain. The PCA of the polarisation parameters indicates that each terrain type, in particular pyroclastic deposit terrain, is represented by a specific signature, corresponding to variations in the behaviour of the polarisation parameters. The peculiar behaviour exhibited by pyroclastic deposits in the negative polarisation branch, which is different from that of normal mature mare surfaces, may be due to unusual structural regolith properties as a consequence of their formation by explosive volcanism. Laboratory analyses and physical modelling studies are needed to quantitatively link the observed polarisation parameters in the negative branch to specific structural regolith parameters.References[1] Shkuratov, Y. and Opanasenko, N. (1992) Icarus 99(2), 468-484.[2] Dollfus, A. (1998) Icarus 136(1), 69-103.[3] Shkuratov, Y. et al. (2007) Icarus 187(2), 406-416.[4] Bhatt, M. et al. (2023) A\&A 674, A82.[5] W\"ohler, C. et al. (2024) AJ 167:187.[6] Shkuratov, Y. et al. (1992) Icarus 95, 283-299.[7] Opanasenko, N. et al. (2022) LPSC LIII, 1194.[8] The Imaging Source (2019) https://www.theimagingsource.com/de-de/product/unique/33u-polarsens/?resolution=5013504\&fps=75\&mono\_color=monochrome[9] Kraaikamp, E. (2023) https://www.autostakkert.com[10] Marsland, S. (2015) Machine Learning: An Algorithmic Perspective. 2nd ed., CRC Press.[11] Gaddis, L. et al. (2003) Icarus 161(2), 262-280.},
   orcidtype = {conference-abstract},
-  orcidputcode = {167205263}
+  orcidputcode = {167205263},
+  scholarid = {BtfJWZkAAAAJ:WF5omc3nYNoC}
 }
 
 @inproceedings{misra2024towards,
@@ -145,18 +157,8 @@
   citations = {1},
   abstract = {Introduction: Dark mantle deposits (DMDs) are one of the lunar lithological units commonly composed of mafic minerals mixed with pyroclasts [1,2]. Lunar pyroclasts in the form of partially crystallized Fe-Ti bearing volcanic glasses provide records of the early history of lunar volcanism [3]. DMDs of diverse nature in terms of their mineralogy and physical characteristics indicate complex nature of lunar explosive volcanism which is not yet fully understood. This study focuses on regional (\ensuremath{>}1000 km2) pyroclastic deposits around Sinus Aestuum (12.1\r{} N, 8.3\r{} W) and Aristarchus (23.7\r{} N, 47.5\r{} W) regions and local deposits (},
   orcidtype = {conference-abstract},
-  orcidputcode = {167205191}
-}
-
-@article{tenthoff20233d,
-  title = {3D models of the Martian surface in virtual reality},
-  author = {Tenthoff, Moritz and Arnaut, Mirza and Barot, Tushar},
-  year = {2023},
-  month = {10},
-  journal = {Bulletin of the American Astronomical Society},
-  url = {https://baas.aas.org/pub/2023n8i212p04/release/1?readingCollection=d89d88af},
-  orcidtype = {journal-article},
-  orcidputcode = {208604921}
+  orcidputcode = {167205191},
+  scholarid = {BtfJWZkAAAAJ:eQOLeE2rZwMC}
 }
 
 @article{arnaut2023the,
@@ -166,30 +168,23 @@
   month = {10},
   journal = {Bulletin of the American Astronomical Society},
   url = {https://ui.adsabs.harvard.edu/abs/2023DPS....5510105A/abstract},
+  citations = {1},
   orcidtype = {journal-article},
-  orcidputcode = {208604037}
+  orcidputcode = {208604037},
+  scholarid = {BtfJWZkAAAAJ:Y0pCki6q_DkC}
 }
 
-@inproceedings{whler2023localized,
-  title = {Localized Polarization Behavior and Inferred Grain Size Distribution at the Lunar Swirl Reiner Gamma in Comparison to Crater Rays and Ejecta Blankets},
-  author = {W\"ohler, C. and Bhatt, M. and Arnaut, M.},
+@article{tenthoff20233d,
+  title = {3D models of the Martian surface in virtual reality},
+  author = {Tenthoff, Moritz and Arnaut, Mirza and Barot, Tushar},
   year = {2023},
-  month = {03},
-  booktitle = {54th Lunar and Planetary Science Conference},
-  url = {https://www.hou.usra.edu/meetings/lpsc2023/pdf/1599.pdf},
-  orcidtype = {conference-paper},
-  orcidputcode = {203610598}
-}
-
-@inproceedings{whler2023spectropolarimetric,
-  title = {Spectropolarimetric Properties of the Lunar Swirl Reiner Gamma and Western Oceanus Procellarum},
-  author = {W\"ohler, C and Bhatt, M and Arnaut, M and Ganesh, S and Aravind, K and Bhardwaj, A},
-  year = {2023},
-  month = {03},
-  booktitle = {54th Lunar and Planetary Science Conference},
-  url = {https://www.hou.usra.edu/meetings/lpsc2023/pdf/1609.pdf},
-  orcidtype = {conference-paper},
-  orcidputcode = {203610597}
+  month = {10},
+  journal = {Bulletin of the American Astronomical Society},
+  url = {https://baas.aas.org/pub/2023n8i212p04/release/1?readingCollection=d89d88af},
+  citations = {1},
+  orcidtype = {journal-article},
+  orcidputcode = {208604921},
+  scholarid = {BtfJWZkAAAAJ:Tyk-4Ss8FVUC}
 }
 
 @inproceedings{arnaut2023yet,
@@ -200,7 +195,34 @@
   booktitle = {54th Lunar and Planetary Science Conference},
   url = {https://www.hou.usra.edu/meetings/lpsc2023/pdf/2997.pdf},
   orcidtype = {conference-paper},
-  orcidputcode = {203610596}
+  orcidputcode = {203610596},
+  scholarid = {BtfJWZkAAAAJ:zYLM7Y9cAGgC}
+}
+
+@inproceedings{whler2023spectropolarimetric,
+  title = {Spectropolarimetric Properties of the Lunar Swirl Reiner Gamma and Western Oceanus Procellarum},
+  author = {W\"ohler, C and Bhatt, M and Arnaut, M and Ganesh, S and Aravind, K and Bhardwaj, A},
+  year = {2023},
+  month = {03},
+  booktitle = {54th Lunar and Planetary Science Conference},
+  url = {https://www.hou.usra.edu/meetings/lpsc2023/pdf/1609.pdf},
+  citations = {1},
+  orcidtype = {conference-paper},
+  orcidputcode = {203610597},
+  scholarid = {BtfJWZkAAAAJ:IjCSPb-OGe4C}
+}
+
+@inproceedings{whler2023localized,
+  title = {Localized Polarization Behavior and Inferred Grain Size Distribution at the Lunar Swirl Reiner Gamma in Comparison to Crater Rays and Ejecta Blankets},
+  author = {W\"ohler, C. and Bhatt, M. and Arnaut, M.},
+  year = {2023},
+  month = {03},
+  booktitle = {54th Lunar and Planetary Science Conference},
+  url = {https://www.hou.usra.edu/meetings/lpsc2023/pdf/1599.pdf},
+  citations = {1},
+  orcidtype = {conference-paper},
+  orcidputcode = {203610598},
+  scholarid = {BtfJWZkAAAAJ:UeHWp8X0CEIC}
 }
 
 @inproceedings{arnaut2022space,
@@ -211,7 +233,8 @@
   booktitle = {53rd Lunar and Planetary Science Conference},
   url = {https://www.hou.usra.edu/meetings/lpsc2022/pdf/2184.pdf},
   orcidtype = {conference-paper},
-  orcidputcode = {203610599}
+  orcidputcode = {203610599},
+  scholarid = {BtfJWZkAAAAJ:qjMakFHDy7sC}
 }
 
 @inproceedings{arnaut2021the,
@@ -223,9 +246,11 @@
   publisher = {Copernicus GmbH},
   doi = {10.5194/epsc2021-770},
   url = {https://meetingorganizer.copernicus.org/EPSC2021/EPSC2021-770.html},
+  citations = {4},
   abstract = {IntroductionThe current understanding of space-weathering is that spectral changes of space-weathered airless planetary bodies are mainly caused by the gradual formation of submicroscopic-sized iron particles (smFe0) in the upper layer of the regolith. The resulting spectral changes include the darkening and reddening of the spectrum as well as the obstruction of diagnostic features [1,2,3]. Previous research also indicates that very small particles (nanophase iron},
   orcidtype = {conference-abstract},
-  orcidputcode = {148747579}
+  orcidputcode = {148747579},
+  scholarid = {BtfJWZkAAAAJ:2osOgNQ5qMEC}
 }
 
 @inproceedings{hess2021uncertaintybased,
@@ -235,19 +260,10 @@
   month = {03},
   booktitle = {52nd Lunar and Planetary Science Conference},
   url = {https://www.hou.usra.edu/meetings/lpsc2021/pdf/1048.pdf},
+  citations = {2},
   orcidtype = {conference-abstract},
-  orcidputcode = {143122315}
-}
-
-@inproceedings{arnaut2020a,
-  title = {A Study of Hyperspectral Clustering-How to Speed Up Spectral Unmixing of Moon Mineralogy Mapper Data},
-  author = {Arnaut, M and Wohlfarth, K and W\"ohler, W},
-  year = {2020},
-  month = {03},
-  booktitle = {51st Annual Lunar and Planetary Science Conference},
-  url = {https://www.hou.usra.edu/meetings/lpsc2020/pdf/3008.pdf},
-  orcidtype = {conference-abstract},
-  orcidputcode = {143122312}
+  orcidputcode = {143122315},
+  scholarid = {BtfJWZkAAAAJ:9yKSN-GCB0IC}
 }
 
 @inproceedings{kosak2020geomorphologic,
@@ -257,8 +273,24 @@
   month = {03},
   booktitle = {51st Lunar and Planetary Science Conference},
   url = {https://www.hou.usra.edu/meetings/lpsc2020/pdf/3044.pdf},
+  researchgate = {https://www.researchgate.net/publication/350153259_GEOMORPHOLOGIC_FEATURE_EXTRACTION_AND_CLUSTERING_OF_MARTIAN_DTM_DATA},
   orcidtype = {conference-abstract},
-  orcidputcode = {143122314}
+  orcidputcode = {143122314},
+  scholarid = {BtfJWZkAAAAJ:d1gkVwhDpl0C}
+}
+
+@inproceedings{arnaut2020a,
+  title = {A Study of Hyperspectral Clustering-How to Speed Up Spectral Unmixing of Moon Mineralogy Mapper Data},
+  author = {Arnaut, M and Wohlfarth, K and W\"ohler, W},
+  year = {2020},
+  month = {03},
+  booktitle = {51st Annual Lunar and Planetary Science Conference},
+  url = {https://www.hou.usra.edu/meetings/lpsc2020/pdf/3008.pdf},
+  researchgate = {https://www.researchgate.net/publication/350152961_A_STUDY_OF_HYPERSPECTRAL_CLUSTERING_-HOW_TO_SPEED_UP_SPECTRAL_UNMIXING_OF_MOON_MINERALOGY_MAPPER_DATA},
+  citations = {2},
+  orcidtype = {conference-abstract},
+  orcidputcode = {143122312},
+  scholarid = {BtfJWZkAAAAJ:u-x6o8ySG0sC}
 }
 
 @inproceedings{arnaut2019mineralogical,
@@ -269,5 +301,6 @@
   booktitle = {50th Annual Lunar and Planetary Science Conference},
   url = {https://www.hou.usra.edu/meetings/lpsc2019/pdf/2661.pdf},
   orcidtype = {conference-abstract},
-  orcidputcode = {143122310}
+  orcidputcode = {143122310},
+  scholarid = {BtfJWZkAAAAJ:u5HHmVD_uO8C}
 }

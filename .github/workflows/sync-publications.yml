@@ -1,10 +1,11 @@
 name: Sync publications
 
-# Re-fetches ORCID (+ Crossref for DOI'd entries) via scripts/sync_publications.py
-# and commits publications.bib + data/publications.json if anything changed.
+# Re-fetches the Google Scholar profile (via SerpApi), enriched by ORCID and
+# Crossref, via scripts/sync_publications.py and commits data/publications.json,
+# data/publications.bib and data/scholar.json if anything changed.
 # The Hugo build itself never hits these APIs live - this is the only place
-# that does, on a schedule, so a flaky ORCID/Crossref response can't break
-# the site build.
+# that does, on a schedule, so a flaky Scholar/ORCID/Crossref response can't
+# break the site build.
 
 on:
   schedule:
@@ -38,19 +39,23 @@ jobs:
         uses: astral-sh/setup-uv@v10.2.0
 
       - name: Run sync script
+        env:
+          GOOGLE_SCHOLAR_ID: ${{ secrets.GOOGLE_SCHOLAR_ID }}
+          SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
         run: uv run scripts/sync_publications.py
 
       - name: Commit and push if changed
         run: |
           set -euo pipefail
-          if git diff --quiet HEAD -- publications.bib data/publications.json; then
+          # Stage first: a plain `git diff` would not see a newly created file.
+          git add data/publications.json data/publications.bib data/scholar.json
+          if git diff --cached --quiet; then
             echo "No publication changes."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add publications.bib data/publications.json
-          git commit -m "chore(publications): sync from ORCID/Crossref"
+          git commit -m "chore(publications): sync from Scholar/ORCID/Crossref"
           # Land on top of anything pushed since checkout.
           git pull --rebase --autostash
           git push

@@ -16,6 +16,11 @@ buildFuture = false
 
 enableEmoji = true
 
+# data/publications.bib is a LaTeX export that lives next to the JSON it is
+# generated from. Hugo tries to unmarshal everything in data/ and fails the
+# build on a format it does not know, so keep it out of Hugo's sight.
+ignoreFiles = ['\.bib$']
+
 # googleAnalytics = "G-XXXXXXXXX"
 
 [pagination]
