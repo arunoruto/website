@@ -47,6 +47,12 @@ serve
 This starts `hugo serve`, opens a browser tab, and builds draft and future-dated posts. The local
 site is available at `http://localhost:1313/`.
 
+Hugo's fast-render mode only rebuilds pages you have viewed and does not always notice new page
+resources — a `feature.png` / `background.png` dropped into an existing bundle can stay invisible
+until you either restart the server or run it with `hugo server -D --disableFastRender`. The same
+applies to a changed `colorScheme`, which additionally needs `--ignoreCache` (the CSS bundle is
+cached on disk in `resources/_gen`).
+
 To reproduce a production build instead:
 
 ```sh
