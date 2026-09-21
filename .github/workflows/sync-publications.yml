@@ -31,8 +31,11 @@ jobs:
       # The script declares its interpreter and dependencies inline (PEP 723),
       # so uv resolves both from the script itself - no setup-python, no
       # pip install, no lockfile to keep in sync.
+      # setup-uv publishes no floating major tags since v8 (supply-chain
+      # hardening) - "@v9" does not exist and fails the job before it starts.
+      # Pin the full version; Dependabot's github-actions updates bump it.
       - name: Install uv
-        uses: astral-sh/setup-uv@v9
+        uses: astral-sh/setup-uv@v10.2.0
 
       - name: Run sync script
         run: uv run scripts/sync_publications.py
