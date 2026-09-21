@@ -114,6 +114,17 @@ CROSSREF_TYPE = {
     "posted-content": "preprint",
     "report": "working-paper",
 }
+# Venues that print meeting abstracts, however the platforms type them: ORCID
+# and Crossref both file the Bulletin of the AAS as a journal.
+ABSTRACT_VENUE = re.compile(r"bulletin of the (american astronomical society|aas)|\babstracts\b", re.IGNORECASE)
+# Copernicus registers meeting abstracts as venue-less posted content; the
+# meeting is only recoverable from the DOI ("10.5194/epsc2026-1062").
+COPERNICUS_MEETING = re.compile(r"^10\.5194/(epsc-dps|epsc|egusphere-egu)(\d{2,4})-", re.IGNORECASE)
+COPERNICUS_MEETING_NAME = {
+    "epsc": "Europlanet Science Congress",
+    "epsc-dps": "EPSC-DPS Joint Meeting",
+    "egusphere-egu": "EGU General Assembly",
+}
 CONFERENCE_VENUE = re.compile(
     r"conference|meeting|congress|symposium|workshop|proceedings|abstracts|assembly", re.IGNORECASE
 )
@@ -300,6 +311,21 @@ def apply_crossref(entry: dict[str, Any], crossref: dict[str, Any]) -> None:
     for field, value in candidates.items():
         if not entry.get(field):
             entry[field] = value
+    # Posted content that is not a preprint is a meeting abstract (Copernicus
+    # registers EPSC/EGU abstracts this way) - ORCID imports it as "preprint",
+    # so this overrides rather than fills in.
+    if crossref.get("type") == "posted-content" and crossref.get("subtype") != "preprint":
+        entry["orcidType"] = "conference-abstract"
+
+
+def refine(entry: dict[str, Any]) -> None:
+    """Correct what the platforms get wrong whichever of them it came from."""
+    meeting = COPERNICUS_MEETING.match(entry["doi"] or "")
+    if meeting and not entry["venue"]:
+        year = meeting[2] if len(meeting[2]) == 4 else f"20{meeting[2]}"
+        entry["venue"] = f"{COPERNICUS_MEETING_NAME[meeting[1].lower()]} {year}"
+    if ABSTRACT_VENUE.search(entry["venue"] or ""):
+        entry["orcidType"] = "conference-abstract"
 
 
 def fetch_serpapi(**params: str) -> dict[str, Any]:
@@ -481,6 +507,7 @@ def build_entry(
         {"view_op": "view_citation", "user": SCHOLAR_ID, "citation_for_view": entry["scholarId"]}
     )
     entry["scholarCitedByUrl"] = (article.get("cited_by") or {}).get("link")
+    refine(entry)
     entry["orcidType"] = entry["orcidType"] or "other"
     entry["bibType"] = BIB_TYPE.get(entry["orcidType"], "misc")
     entry["category"] = CATEGORY.get(entry["orcidType"], "other")

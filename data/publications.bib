@@ -13,43 +13,46 @@
   scholarid = {BtfJWZkAAAAJ:Se3iqnhoufwC}
 }
 
-@unpublished{arnaut2026disentangling,
+@inproceedings{arnaut2026disentangling,
   title = {Disentangling Composition and Grain Size Effects in PlanetaryAnalogs: A Multi-Wavelength Polarimetric Analysis},
   author = {Mirza Arnaut and Siddhesh Kakade and Christian W\"ohler},
   year = {2026},
   month = {07},
+  booktitle = {Europlanet Science Congress 2026},
   publisher = {Copernicus GmbH},
   doi = {10.5194/epsc2026-1062},
   url = {https://doi.org/10.5194/epsc2026-1062},
   abstract = {. IntroductionThe remote characterization of atmosphereless celestial bodies relies on understanding scattered sunlight. The Degree of Linear Polarization (DoLP) is a sensitive tool for analyzing the physical properties of granular soils [1]. However, interpreting these polarization curves is complicated by two main factors: the difference between opaque surface scattering (e.g., in rocks) and semi-transparent volume scattering (e.g., in glasses) across various wavelengths [2], and the discrepancy between mechanical sieve sizes and true optical scattering behavior [3]. This study investigates the optical behavior of crushed planetary simulants by combining multi-wavelength laboratory polarimetry with Principal Component Analysis (PCA). The goal is to objectively separate how material composition and grain size influence on shape of polarization phase curves.2. Laboratory Measurements and Curve FittingLaboratory polarimetry was conducted on samples of crystalline basalt and amorphous glass. The samples were mechanically separated into three sieve bins (},
-  orcidtype = {preprint},
+  orcidtype = {conference-abstract},
   orcidputcode = {219486025},
   scholarid = {BtfJWZkAAAAJ:hqOjcs7Dif8C}
 }
 
-@unpublished{sander2026investigating,
+@inproceedings{sander2026investigating,
   title = {Investigating Lunar Swirls Using a Multimodal Transformer: A Masked Autoencoder Approach for Integrating Heterogeneous Planetary Remote Sensing Data},
   author = {Tom Sander and Kay Wohlfarth and Mirza Arnaut and Marcel Hess and Christian W\"ohler},
   year = {2026},
   month = {07},
+  booktitle = {Europlanet Science Congress 2026},
   publisher = {Copernicus GmbH},
   doi = {10.5194/epsc2026-883},
   url = {https://doi.org/10.5194/epsc2026-883},
   abstract = {IntroductionLunar swirls are a unique class of surface features defined by sinuous, high-albedo markings that lack distinct topographic or stratigraphic expression. These features are influenced by crustal magnetism, regolith maturation, and space weathering, yet decades of orbital observations have not resolved the competing hypotheses for their formation. Proposed models include solar wind shielding by localized mini-magnetospheres [1, 2], surface scouring from cometary impacts [3], and electrostatic transport of fine-grained regolith [4, 5]. Previous efforts to distinguish among these hypotheses have primarily relied on qualitative interpretation, mineralogical correlations [6], and linear regression methods [7]. However, these traditional approaches are limited in their capacity to capture the complex, high-dimensional, and nonlinear relations present in multimodal planetary datasets. To address the need for advanced data integration in planetary science, this study introduces a multimodal machine learning model that synthesizes distinct categories of orbital datasets, such as spectral and radar measurements, to identify the unified physical signatures of lunar swirls.MethodologyDrawing on recent breakthroughs in foundational vision-language models (VLA), a state-of-the-art multimodal Masked Autoencoder (MAE) based on a Transformer architecture was developed and trained on 12 distinct remote sensing modalities. The dataset covers 56 sites across 8 recognized lunar swirls (see Figure 1). As shown in Figure 2, the model processes heterogeneous input modalities, including image-like geophysical observations (such as LRO WAC reflectance, LRO Mini-RF radar backscatter, M3-derived elemental abundance maps, and brightness temperature) and textual spatial position information, which are jointly routed through a shared Transformer encoder-decoder. To approach the unique characteristics of each input, image-based modalities are compressed into discrete latent tokens using a dedicated, pre-trained VQ-GAN-style tokenizer, while textual coordinate modalities employ a structured, regex-based tokenization method. This brings the training dataset up to 39 million individual tokens. The Transformer encoder processes a visible subset of these tokens, and the decoder reconstructs the masked subset for each modality, compelling the network to acquire robust cross-modal geophysical relationships. The model underwent rigorous validation by repeated stratified cross-validation, followed by deployment as an exploratory tool using Leave-One-Out (LOO) ablations, Leave-One-In (LOI) evaluations, and Representational Similarity Analysis (RSA).ResultsDeploying the validated Transformer as an exploratory probe revealed quantitative constraints on the physical nature of lunar swirls. Leave-One-Out and Leave-One-In ablations identified plagioclase abundance as the most critical modality for boundary delineation, while Wide Angle Camera (WAC) reflectance emerged as the most independently sufficient dataset. Representational Similarity Analysis further demonstrated that the network encodes geophysical content along directions geometrically distinct from spatial coordinates. This confirms the model successfully captures a shared physical context across swirl sites, rather than relying on location-specific biases. By extending this ablation logic to the spatial domain, we found that the dependence of optical reflectance on mineralogical inputs is significantly stronger within swirl interiors than in the surrounding terrain. Crucially, no comparable enhancement in cross-modal coupling was observed for thermal emission or Mini-RF radar backscatter. This distinct asymmetry provides the empirical signature predicted by the maturation-retardation hypothesis, clearly separating it from competing scenarios, including cometary impacts or dust transport.Discussion and ConclusionThe enhanced optical-compositional coupling observed inside lunar swirls is the empirical signature uniquely predicted by the maturation-retardation hypothesis [8, 9]. Reduced solar wind exposure preserves the structural relationship between regolith composition and observed brightness, a relationship that is otherwise obscured by accumulated nanophase iron in normally weathered background terrain [8, 11]. Alternative scenarios, such as cometary impacts [3], electrostatic dust transport [4], or thermophysical modification, do not predict this specific asymmetry. Instead, these alternative formation models would suggest that thermal or radar properties should exhibit similarly enhanced coupling to other physical domains within the swirls. This work characterizes the analytical limits of current orbital archives, highlighting that orbital data alone cannot definitively distinguish solar-wind shielding from other mechanisms that equivalently slow regolith maturation. Resolving the deeper structural and magnetic origins of swirls requires in-situ measurements, such as those planned for the upcoming Lunar Vertex mission [10]. Our results show that machine learning can extract complex, non-linear relationships from existing planetary datasets. This not only maximizes the data from legacy missions but also helps prioritize targets for future surface exploration.References[1] Bamford, R., et al., ''Minimagnetospheres above the lunar surface and the formation of lunar swirls'', Physical Review Letters, 2012.[2] Deca, J., et al., ''Reiner gamma albedo features reproduced by modeling solar wind standoff'', Communications Physics, 2018.[3] Schultz, P.H., Srnka, L.J., ''Cometary collisions on the moon and mercury'', Nature, 1980.[4] Garrick-Bethell, I., et al., ''Spectral properties, magnetic fields, and dust transport at lunar swirls'', Icarus, 2011.[5] Domingue, D., et al., ''Topographic correlations within lunar swirls in mare ingenii'', Geophysical Research Letters, 2022.[6] Domingue, D., et al., ''Spectrophotometric and topographic correlations within the mare ingenii swirl region: Evidence for a highly mobile lunar regolith'', The Planetary Science Journal, 2023.[7] Chrbolkov\'a, K., et al., ''Reflectance spectra of seven lunar swirls examined by statistical methods: A space weathering study'', Icarus, 2019.[8] Hess, M., et al., ''Processes governing the vis/nir spectral reflectance behavior of lunar swirls'', Astronomy \& Astrophysics, 2020.[9] Zhao, W., et al., ''Formation of lunar swirls: Implication from derived nanophase iron abundance'', Remote Sensing, 2025.[10] Vines, S., et al., ''Lunar vertex: A prism science investigation of the Reiner gamma lunar magnetic anomaly and swirl'', EGU, 2023.[11] Kramer, G.Y., et al., ''M3 spectral analysis of lunar swirls and the link between optical maturation and surface hydroxyl formation at magnetic anomalies'', Journal of Geophysical Research: Planets, 2011.},
-  orcidtype = {preprint},
+  orcidtype = {conference-abstract},
   orcidputcode = {219486024}
 }
 
-@unpublished{arnaut2025the,
+@inproceedings{arnaut2025the,
   title = {The Moon as an Asteroid: Unlocking Surface Secrets with Atlas Polarimetry},
   author = {Mirza Arnaut and Christian W\"ohler and Dibyendu Misra and Megha Bhatt and Shashikiran Ganesh},
   year = {2025},
   month = {07},
+  booktitle = {EPSC-DPS Joint Meeting 2025},
   publisher = {Copernicus GmbH},
   doi = {10.5194/epsc-dps2025-1232},
   url = {https://doi.org/10.5194/epsc-dps2025-1232},
   abstract = {IntroductionThe polarimetric properties of airless Solar System bodies provide invaluable insights into their surface characteristics. While extensively applied to asteroids, often interpreted using empirical models, the Moon {\textendash} our most meticulously studied airless body {\textendash} offers a unique ''ground-truth'' calibrated benchmark. Historical lunar polarimetry established fundamental relationships [1,2,3]. This study focuses on the geologically diverse Atlas crater region, treating its terrains as distinct analogues for asteroid surfaces. We employ a multi-step approach: first, fitting an empirical model typically used for Near-Earth Asteroids (NEAs) to characterize phase curve behavior and extract key parameters; second, applying Principal Component Analysis (PCA) to this set of derived and fitted parameters to identify dominant modes of variation; and third, utilizing machine learning for terrain segmentation based on these PCA components. This work aims to: (1) derive robust polarimetric parameters and identify distinct polarimetric units within Atlas using four spectral bands (B,V,R,I); (2) enhance understanding of how lunar surface properties (e.g., soil maturity, pyroclastic deposits) govern these signatures; and (3) provide a well-constrained calibration dataset for interpreting polarimetric observations of asteroids.2 MethodsSpectropolarimetric observations of the Atlas crater region were acquired in the Johnson-Cousins BVRI filter bands. The instrumentation included a 430mm reflector telescope located at Mount Abu, India, and a 200mm reflector telescope at Wetter, Germany. The camera system employed, as detailed in [4], provided an image scale of approximately 0.9 km/pixel. The data capture the degree of linear polarization (DoLP) as a function of phase angle (\ensuremath{\alpha}) across these four spectral bands.1. Empirical Phase Curve Modeling: We applied the empirical phase-polarization model described for NEAs by Bagnulo et al. [5, Section 2.2, Equation 7]: DoLP(\ensuremath{\alpha})=A{\textperiodcentered} sinB (\ensuremath{\alpha}) {\textperiodcentered} cosC (\ensuremath{\alpha}/2) {\textperiodcentered} sin(\ensuremath{\alpha} \ensuremath{-} \ensuremath{\alpha}inv). This model was fitted to the observed DoLP phase curves for sub-regions within the Atlas study area (example in Fig. 1).Figure 1 (Highland)This yields maps of the fitted model parameters A, B, C, and \ensuremath{\alpha}inv (Fig. 2). From these best-fit curves, features like minimum/maximum polarization (Pmin, Pmax) and their respective phase angles (\ensuremath{\alpha}min, \ensuremath{\alpha}max) were also numerically derived (Fig. 3). Figure 2 Figure 32. Principal Component Analysis (PCA) of Parameters: PCA was subsequently performed on the combined set of these eight parameters (four fitted: A, B, C, \ensuremath{\alpha}inv; and four derived: Pmin, \ensuremath{\alpha}min, Pmax, \ensuremath{\alpha}max) obtained for each pixel across the BVRI bands. This approach reduces the dimensionality of the parameter space and identifies the principal axes of variation in the collective polarimetric response characteristics (Fig. 4).Figure 43. Clustering: Unsupervised machine learning (Gaussian Mixture Model clustering) was applied to the significant PCA components derived from theparameter set. This step segments the Atlas region into distinct units based on similarities in their comprehensive polarimetric parameter signatures (Fig. 5).Figure 53 ResultsThe integrated analysis of the Atlas BVRI spectropolarimetric dataset yields several key findings:1. Empirical Model and Derived Parameter Maps: The spatial maps of the fitted parameters (A,B,C,\ensuremath{\alpha}inv, Fig. 2) and the derived polarimetric features (Pmin,\ensuremath{\alpha}min,Pmax,\ensuremath{\alpha}max, Fig. 3) exhibit apparent variations correlated with known geological units. Notably, higher \ensuremath{\alpha}max values are observed for more mature mare surfaces compared to the fresh ejecta of Atlas crater, consistent with Shkuratov et al. [6] linking higher \ensuremath{\alpha}max to increased soil maturity.2. PCA of Parameter Space: The PCA components map (Fig. 4), derived from the comprehensive set of eight fitted and derived parameters, effectively highlights geological distinctions and interdependencies between these parameters. Different colors in the PCA map correspond to distinct combined polarimetric characterizations.3. Clustering Results: The Gaussian Mixture Model clustering applied to the PCA components of the parameter set (Fig. 5) successfully segments the Atlas region into distinct units. A strong spatial correlation is observed between specific clusters and known pyroclastic deposits, on the floor of the Atlas crater. This indicates that the combined polarimetric parameters captured by PCA are sensitive to such deposits, yielding results for terrain differentiation similar in utility to the direct DoLP analysis in W\"ohler, et al. [4].4. Wavelength Dependencies: All initial parameters demonstrate noticeable dependencies on wavelength across the BVRI bands, which are propagated into the PCA and clustering stages.4 DiscussionThe Atlas region serves as an exceptional natural laboratory. By first parameterizing the phase curve behavior using an empirical model (Figs. 2,3), we distill the polarimetric information into a set of physically meaningful (though empirical) coefficients and features. The subsequent PCA on this parameter space (Fig. 4) identifies the dominant combinations of these characteristics that differentiate lunar terrains. The observed correlation between higher \ensuremath{\alpha}max values and increased soil maturity provides a quantitative lunar benchmark. Critically, the clustering of these PCA-reduced parameters (Fig. 5) demonstrates a powerful capacity to identify and map geological units, the pyroclastic deposits. Although the PCA is applied to a different input dataset than in W\"ohler, et al. [4] (parameters vs. raw DoLP), the ability to distinguish terrains, including pyroclastics, remains robust, suggesting that the information content is well-preserved and effectively summarized by the empirical model parameters.5 ConclusionThis study demonstrates a novel approach by combining empirical phase curve modeling with PCA of the resulting parameter set and subsequent machine learning to analyze BVRI lunar spectropolarimetric data from the Atlas region. We have quantitatively characterized phase curve behavior and identified distinct polarimetric units defined by combinations of these parameters, linking them to geological features and surface properties like soil maturity and pyroclastic deposits. These findings establish the Atlas region as a crucial calibration site for interpreting asteroid polarimetry, and the methodology offers a new avenue for extracting comprehensive insights from polarimetric datasets.[1] Lyot,Ph.D.Thesis,Jan.1929.[2] Dollfus,Planets\&Satellites.Jan.1961,p.343.[3] Shkuratov et al.,PSS59.13(Oct.2011),pp.1326{\textendash}1371.[4] W\"ohler et al., AJ167.5(May2024),p.187.[5] Bagnulo, et al.,A\&A32.1(Dec.2024)[6] Shkuratov et al., Icarus187.2(Apr.2007),pp.406{\textendash}4},
-  orcidtype = {preprint},
+  orcidtype = {conference-abstract},
   orcidputcode = {187614174},
   scholarid = {BtfJWZkAAAAJ:UebtZRa9Y70C}
 }
@@ -137,6 +140,7 @@
   author = {Christian W\"ohler and Megha Bhatt and Mirza Arnaut and Dibyendu Misra and Shashikiran Ganesh and Anil Bhardwaj},
   year = {2024},
   month = {07},
+  booktitle = {Europlanet Science Congress 2024},
   publisher = {Copernicus GmbH},
   doi = {10.5194/epsc2024-995},
   url = {http://dx.doi.org/10.5194/epsc2024-995},
@@ -151,6 +155,7 @@
   author = {Dibyendu Misra and Megha Bhatt and Christian W\"ohler and Mirza Arnaut and Nachiketa Rai and Neeraj Srivastava and Shashikiran Ganesh and Anil Bhardwaj},
   year = {2024},
   month = {07},
+  booktitle = {Europlanet Science Congress 2024},
   publisher = {Copernicus GmbH},
   doi = {10.5194/epsc2024-1085},
   url = {http://dx.doi.org/10.5194/epsc2024-1085},
@@ -159,32 +164,6 @@
   orcidtype = {conference-abstract},
   orcidputcode = {167205191},
   scholarid = {BtfJWZkAAAAJ:eQOLeE2rZwMC}
-}
-
-@article{arnaut2023the,
-  title = {The moon polarizes and it matters: New lunar spectropolarimetric datasets, effects and models},
-  author = {Arnaut, Mirza and W\"ohler, Christian and Bhatt, Megha},
-  year = {2023},
-  month = {10},
-  journal = {Bulletin of the American Astronomical Society},
-  url = {https://ui.adsabs.harvard.edu/abs/2023DPS....5510105A/abstract},
-  citations = {1},
-  orcidtype = {journal-article},
-  orcidputcode = {208604037},
-  scholarid = {BtfJWZkAAAAJ:Y0pCki6q_DkC}
-}
-
-@article{tenthoff20233d,
-  title = {3D models of the Martian surface in virtual reality},
-  author = {Tenthoff, Moritz and Arnaut, Mirza and Barot, Tushar},
-  year = {2023},
-  month = {10},
-  journal = {Bulletin of the American Astronomical Society},
-  url = {https://baas.aas.org/pub/2023n8i212p04/release/1?readingCollection=d89d88af},
-  citations = {1},
-  orcidtype = {journal-article},
-  orcidputcode = {208604921},
-  scholarid = {BtfJWZkAAAAJ:Tyk-4Ss8FVUC}
 }
 
 @inproceedings{arnaut2023yet,
@@ -223,6 +202,32 @@
   orcidtype = {conference-paper},
   orcidputcode = {203610598},
   scholarid = {BtfJWZkAAAAJ:UeHWp8X0CEIC}
+}
+
+@inproceedings{arnaut2023the,
+  title = {The moon polarizes and it matters: New lunar spectropolarimetric datasets, effects and models},
+  author = {Arnaut, Mirza and W\"ohler, Christian and Bhatt, Megha},
+  year = {2023},
+  month = {10},
+  booktitle = {Bulletin of the American Astronomical Society},
+  url = {https://ui.adsabs.harvard.edu/abs/2023DPS....5510105A/abstract},
+  citations = {1},
+  orcidtype = {conference-abstract},
+  orcidputcode = {208604037},
+  scholarid = {BtfJWZkAAAAJ:Y0pCki6q_DkC}
+}
+
+@inproceedings{tenthoff20233d,
+  title = {3D models of the Martian surface in virtual reality},
+  author = {Tenthoff, Moritz and Arnaut, Mirza and Barot, Tushar},
+  year = {2023},
+  month = {10},
+  booktitle = {Bulletin of the American Astronomical Society},
+  url = {https://baas.aas.org/pub/2023n8i212p04/release/1?readingCollection=d89d88af},
+  citations = {1},
+  orcidtype = {conference-abstract},
+  orcidputcode = {208604921},
+  scholarid = {BtfJWZkAAAAJ:Tyk-4Ss8FVUC}
 }
 
 @inproceedings{arnaut2022space,
