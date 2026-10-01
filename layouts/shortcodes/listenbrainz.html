@@ -18,6 +18,11 @@
                  backdrop: the cover, blurred, fills the card; tinted by the
                            cover's dominant colour until the art is in
                  vinyl:    no box, the cover is a record that spins while playing
+                 glass:    frosted translucent panel with the cover's colour as
+                           an ambient glow around it
+        tinted   "true" paints a boxed variant (card, pill, glass) with the
+                 cover's dominant colour, white text on top; no-op elsewhere
+                 and until the colour is known
         center   "true" centres a block variant and caps it at 28rem  */}}
 {{- $user := .Get "user" | default site.Params.listenbrainz.user -}}
 {{- if not $user -}}
@@ -25,11 +30,13 @@
 {{- end -}}
 {{- $variant := .Get "variant" | default "card" -}}
 {{- if eq $variant "default" }}{{ $variant = "card" }}{{ end -}}
-{{- $variants := slice "card" "pill" "inline" "backdrop" "vinyl" -}}
+{{- $variants := slice "card" "pill" "inline" "backdrop" "vinyl" "glass" -}}
 {{- if not (in $variants $variant) -}}
   {{- errorf "listenbrainz shortcode: variant must be one of %s, got %q (%s)" (delimit $variants ", ") $variant .Position -}}
 {{- end -}}
-{{- $center := in (slice "true" "1" "yes" "on") (lower (.Get "center" | default "false")) -}}
+{{- $truthy := slice "true" "1" "yes" "on" -}}
+{{- $center := in $truthy (lower (.Get "center" | default "false")) -}}
+{{- $tinted := in $truthy (lower (.Get "tinted" | default "false")) -}}
 {{- $profile := printf "https://listenbrainz.org/user/%s/" $user -}}
 
 {{- $opts := dict
@@ -40,7 +47,7 @@
 -}}
 {{- $js := resources.Get "js/listenbrainz.js" | js.Build $opts | resources.Fingerprint (site.Params.fingerprintAlgorithm | default "sha512") -}}
 
-<span class="listenbrainz listenbrainz--{{ $variant }}{{ if $center }} listenbrainz--center{{ end }}" data-listenbrainz-user="{{ $user }}" data-listenbrainz-state="loading">
+<span class="listenbrainz listenbrainz--{{ $variant }}{{ if $center }} listenbrainz--center{{ end }}{{ if $tinted }} listenbrainz--tinted{{ end }}" data-listenbrainz-user="{{ $user }}" data-listenbrainz-state="loading">
   {{- if eq $variant "backdrop" }}
   <img class="listenbrainz__backdrop" alt="" aria-hidden="true" decoding="async">
   {{- end }}

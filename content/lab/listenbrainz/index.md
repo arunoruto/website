@@ -43,6 +43,18 @@ Somewhere in a sentence: right now that would be {{< listenbrainz user="arunorut
 
 {{< listenbrainz user="arunoruto" variant="vinyl" >}}
 
+## glass
+
+{{< listenbrainz user="arunoruto" variant="glass" >}}
+
+## tinted="true" on pill, card, glass
+
+{{< listenbrainz user="arunoruto" variant="pill" tinted="true" >}}
+
+{{< listenbrainz user="arunoruto" tinted="true" >}}
+
+{{< listenbrainz user="arunoruto" variant="glass" tinted="true" >}}
+
 ## card, centred
 
 {{< listenbrainz user="arunoruto" center="true" >}}

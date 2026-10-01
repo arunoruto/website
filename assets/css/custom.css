@@ -214,12 +214,6 @@
   }
 }
 
-.listenbrainz[data-listenbrainz-state="error"] .listenbrainz__label::after {
-  content: " (offline)";
-  text-transform: none;
-  letter-spacing: normal;
-}
-
 .listenbrainz--center {
   max-width: 28rem;
   margin-left: auto;
@@ -474,6 +468,105 @@
   .listenbrainz--vinyl .listenbrainz__art {
     animation: none;
   }
+}
+
+/* variant="glass": a frosted panel the page shows through, with the cover's
+   colour as an ambient glow around and a wash inside it (via ::before, which
+   sits under everything else like the backdrop image does). Text follows the
+   scheme, so it works on light and dark alike. */
+.listenbrainz--glass {
+  gap: 1.25rem;
+  padding: 1rem;
+  border: 1px solid rgb(255 255 255 / 0.4);
+  border-radius: 1.25rem;
+  background: rgb(var(--color-neutral) / 0.55);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.08),
+    0 28px 60px -24px rgb(var(--listenbrainz-tint, 0 0 0) / 0.6),
+    0 0 90px -30px rgb(var(--listenbrainz-tint, 0 0 0) / 0.6);
+}
+
+.dark .listenbrainz--glass {
+  border-color: rgb(255 255 255 / 0.12);
+  background: rgb(var(--color-neutral-800) / 0.45);
+}
+
+.listenbrainz--glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(120% 140% at 0% 0%, rgb(var(--listenbrainz-tint, 0 0 0) / 0.35), transparent 65%);
+  opacity: 0;
+  transition: opacity 600ms;
+  pointer-events: none;
+}
+
+.listenbrainz--glass.has-tint::before {
+  opacity: 1;
+}
+
+.listenbrainz--glass .listenbrainz__art {
+  width: 5rem;
+  height: 5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 24px -8px rgb(0 0 0 / 0.5);
+}
+
+.listenbrainz--glass .listenbrainz__track {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.listenbrainz--glass:hover {
+  border-color: rgb(var(--listenbrainz-tint, var(--color-primary-500)) / 0.8);
+}
+
+/* tinted="true": the cover's colour becomes the background of a boxed variant
+   (card, pill, glass). A translucent layer of the tint over a near-black base
+   keeps it deep enough for white text whatever the sleeve. Nothing happens
+   until the colour is sampled, so the normal look is the fallback. The
+   [data-listenbrainz-state] hook only adds specificity over the .dark rules. */
+.listenbrainz--tinted.has-tint.listenbrainz--card,
+.listenbrainz--tinted.has-tint.listenbrainz--pill,
+.listenbrainz--tinted.has-tint.listenbrainz--glass {
+  border-color: rgb(var(--listenbrainz-tint) / 0.6);
+  background:
+    linear-gradient(135deg, rgb(var(--listenbrainz-tint) / 0.78), rgb(var(--listenbrainz-tint) / 0.42))
+    rgb(18 18 24);
+  color: #fff;
+  box-shadow: 0 16px 40px -18px rgb(var(--listenbrainz-tint) / 0.9);
+}
+
+.listenbrainz--tinted.has-tint.listenbrainz--glass::before {
+  opacity: 0;
+}
+
+.listenbrainz--tinted.has-tint:hover {
+  border-color: rgb(255 255 255 / 0.6);
+}
+
+.listenbrainz.listenbrainz--tinted.has-tint[data-listenbrainz-state] .listenbrainz__art {
+  background: rgb(255 255 255 / 0.15);
+  color: rgb(255 255 255 / 0.6);
+}
+
+.listenbrainz.listenbrainz--tinted.has-tint[data-listenbrainz-state] .listenbrainz__status,
+.listenbrainz.listenbrainz--tinted.has-tint[data-listenbrainz-state] .listenbrainz__meta,
+.listenbrainz.listenbrainz--tinted.has-tint[data-listenbrainz-state] .listenbrainz__profile {
+  color: rgb(255 255 255 / 0.82);
+}
+
+.listenbrainz.listenbrainz--tinted.has-tint[data-listenbrainz-state] .listenbrainz__track a,
+.listenbrainz.listenbrainz--tinted.has-tint[data-listenbrainz-state] .listenbrainz__link:focus-visible {
+  color: #fff;
+  outline-color: #fff;
+}
+
+.listenbrainz.listenbrainz--tinted.has-tint[data-listenbrainz-state]:hover .listenbrainz__profile {
+  color: #fff;
 }
 
 /* Interactive figures rendered by layouts/shortcodes/viz.html and driven by

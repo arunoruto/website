@@ -1,7 +1,9 @@
-/* Drives the card rendered by layouts/shortcodes/listenbrainz.html.
+/* Drives the cards rendered by layouts/shortcodes/listenbrainz.html.
 
-   State comes from two GETs against api.listenbrainz.org (playing-now + the
-   latest listen). Updates arrive three ways, cheapest first:
+   Every card for the same user shares one source (createSource), so a page
+   with several variants still costs one poll loop, one feed socket and one art
+   lookup per track. State comes from two GETs against api.listenbrainz.org
+   (playing-now + the latest listen). Updates arrive three ways, cheapest first:
      - the live feed ListenBrainz's own user page subscribes to (Socket.IO over a
        bare WebSocket, see openFeed) pushes playing_now / listen events, each of
        which triggers a refetch;
@@ -16,8 +18,8 @@
    Cover art: ListenBrainz resolves finished listens to MusicBrainz ids and hands
    back a Cover Art Archive id with them, but a playing-now listen has no mapping
    yet. The listen that was just submitted is usually the same track, so its art
-   is reused; otherwise a MusicBrainz search fills the gap. Results are cached
-   per track so re-polls cost nothing. */
+   is reused; otherwise a MusicBrainz search fills the gap. The cover's dominant
+   colour is sampled alongside. Results are cached per track. */
 
 const API = "https://api.listenbrainz.org/1/user/";
 const FEED = "wss://listenbrainz.org/socket.io/?EIO=4&transport=websocket";
@@ -191,28 +193,41 @@ function openFeed(user, handlers) {
   return ws;
 }
 
-function mount(root) {
-  const user = root.dataset.listenbrainzUser;
+/* One per user on the page, shared by every card showing that user. Owns the
+   polling, the feed socket, the art lookups and the sessionStorage snapshot,
+   and hands subscribers a snapshot { state, live, listen, recent } plus the
+   feed mode whenever either changes. */
+function createSource(user) {
   const base = API + encodeURIComponent(user);
   const cacheKey = `listenbrainz:${user}`;
-  const cover = root.querySelector(".listenbrainz__cover");
-  const backdrop = root.querySelector(".listenbrainz__backdrop"); // backdrop variant only
-  const label = root.querySelector(".listenbrainz__label");
-  const track = root.querySelector(".listenbrainz__track");
-  const artist = root.querySelector(".listenbrainz__artist");
-  const release = root.querySelector(".listenbrainz__release");
-  const artCache = new Map(); // track key -> { url, tint }, both nullable
-  let shownKey = null;
-  let current = null; // { live, listen, recent } behind what is on screen
+  const subscribers = new Set();
+  const art = new Map(); // track key -> Promise<{ url, tint }>, both nullable
+  let snapshot = { state: "loading" };
+  let feedMode = "poll";
   let endGuess = null; // when the live track should be over (ms epoch)
   let timer = null;
   let feed = null;
-  let feedUp = false;
   let feedTimer = null;
   let feedRetry = FEED_RETRY_MS[0];
 
-  cover.addEventListener("error", () => root.classList.remove("has-art"));
-  cover.addEventListener("load", () => root.classList.add("has-art"));
+  function emit() {
+    for (const fn of subscribers) fn(snapshot, feedMode);
+  }
+
+  function artFor(listen, recent) {
+    const key = trackKey(listen);
+    if (!art.has(key)) {
+      art.set(key, (async () => {
+        let url = mappedArt(listen);
+        if (!url && recent && trackKey(recent) === key) url = mappedArt(recent);
+        if (!url) url = await searchArt(listen).then(firstLoadable).catch(() => null);
+        const tint = url ? await sampleTint(url) : null;
+        return { url, tint };
+      })());
+      art.get(key).then(writeCache); // the snapshot carries the art once known
+    }
+    return art.get(key);
+  }
 
   function readCache() {
     try {
@@ -222,73 +237,29 @@ function mount(root) {
     return null;
   }
 
-  function writeCache() {
-    if (!current) return;
+  async function writeCache() {
+    if (!snapshot.listen) return;
+    const key = trackKey(snapshot.listen);
+    const resolved = art.has(key) ? await art.get(key) : null;
     try {
-      sessionStorage.setItem(cacheKey, JSON.stringify({ at: Date.now(), ...current, art: artCache.get(shownKey) ?? null }));
+      const { live, listen, recent } = snapshot;
+      sessionStorage.setItem(cacheKey, JSON.stringify({ at: Date.now(), live, listen, recent, art: resolved }));
     } catch { /* private mode, quota - the cache is only a nicety */ }
   }
 
-  async function showArt(key, listen, recent) {
-    if (!artCache.has(key)) {
-      let url = mappedArt(listen);
-      if (!url && recent && trackKey(recent) === key) url = mappedArt(recent);
-      if (!url) url = await searchArt(listen).then(firstLoadable).catch(() => null);
-      const tint = url ? await sampleTint(url) : null;
-      artCache.set(key, { url, tint });
-    }
-    const { url, tint } = artCache.get(key);
-    if (shownKey !== key) return; // the track changed while we were searching
-    if (!url) {
-      root.classList.remove("has-art");
-      cover.removeAttribute("src");
-      backdrop?.removeAttribute("src");
-    } else if (cover.getAttribute("src") !== url) {
-      root.classList.remove("has-art");
-      cover.src = url;
-      if (backdrop) backdrop.src = url;
-    }
-    if (tint) {
-      root.style.setProperty("--listenbrainz-tint", tint);
-      root.classList.add("has-tint");
-    } else {
-      root.style.removeProperty("--listenbrainz-tint");
-      root.classList.remove("has-tint");
-    }
-    writeCache();
-  }
-
-  function render(listen, live, recent, seenAt = Date.now()) {
-    const t = listen.track_metadata;
-    const info = t.additional_info || {};
+  function show(listen, live, recent, seenAt = Date.now()) {
     const key = trackKey(listen);
-
-    root.dataset.listenbrainzState = live ? "playing" : "idle";
-    label.textContent = live ? "Now playing" : `Last played ${ago(listen.listened_at)}`;
-    current = { live, listen, recent };
-
-    if (key !== shownKey) {
-      shownKey = key;
+    const changed = !snapshot.listen || trackKey(snapshot.listen) !== key;
+    if (changed) {
       // Upper bound: the track was at most this far from its end when first seen.
       const ms = live ? durationMs(listen) : null;
       endGuess = ms ? seenAt + ms : null;
-      track.replaceChildren();
-      if (info.origin_url) {
-        const a = document.createElement("a");
-        a.href = info.origin_url;
-        a.target = "_blank";
-        a.rel = "noopener noreferrer";
-        a.textContent = t.track_name;
-        track.append(a);
-      } else {
-        track.textContent = t.track_name;
-      }
-      artist.textContent = t.artist_name || "";
-      release.textContent = t.release_name || "";
-      showArt(key, listen, recent);
     } else if (!live) {
       endGuess = null;
     }
+    snapshot = { state: live ? "playing" : "idle", live, listen, recent };
+    artFor(listen, recent);
+    emit();
     writeCache();
   }
 
@@ -303,13 +274,19 @@ function mount(root) {
       ]);
       const live = now.payload.listens[0] || null;
       const recent = history.payload.listens[0] || null;
-      if (live) render(live, true, recent);
-      else if (recent) render(recent, false, null);
-      else root.dataset.listenbrainzState = "empty";
+      if (live) show(live, true, recent);
+      else if (recent) show(recent, false, null);
+      else {
+        snapshot = { state: "empty" };
+        emit();
+      }
       schedule();
     } catch (err) {
       console.warn("listenbrainz:", err);
-      if (shownKey === null) root.dataset.listenbrainzState = "error";
+      if (!snapshot.listen) {
+        snapshot = { state: "error" };
+        emit();
+      }
       schedule(RETRY_MS);
     }
   }
@@ -319,7 +296,7 @@ function mount(root) {
     clearTimeout(timer);
     timer = null;
     if (document.visibilityState !== "visible") return;
-    let delay = override ?? (feedUp ? SAFETY_MS : POLL_MS);
+    let delay = override ?? (feedMode === "live" ? SAFETY_MS : POLL_MS);
     if (!override && endGuess) delay = Math.max(3_000, Math.min(delay, endGuess - Date.now() + 2_000));
     timer = setTimeout(poll, delay);
   }
@@ -336,9 +313,9 @@ function mount(root) {
     if (feed || document.visibilityState !== "visible" || typeof WebSocket === "undefined") return;
     feed = openFeed(user, {
       onOpen() {
-        feedUp = true;
+        feedMode = "live";
         feedRetry = FEED_RETRY_MS[0];
-        root.dataset.listenbrainzFeed = "live";
+        emit();
         schedule();
       },
       onEvent(event) {
@@ -346,8 +323,8 @@ function mount(root) {
       },
       onClose() {
         feed = null;
-        feedUp = false;
-        root.dataset.listenbrainzFeed = "poll";
+        feedMode = "poll";
+        emit();
         if (document.visibilityState === "visible") {
           feedTimer = setTimeout(connectFeed, feedRetry);
           feedRetry = Math.min(feedRetry * 2, FEED_RETRY_MS[1]);
@@ -371,12 +348,89 @@ function mount(root) {
 
   const cached = readCache();
   if (cached) {
-    if (cached.art && typeof cached.art === "object") artCache.set(trackKey(cached.listen), cached.art);
-    render(cached.listen, cached.live, cached.recent, cached.at);
+    if (cached.art && typeof cached.art === "object") art.set(trackKey(cached.listen), Promise.resolve(cached.art));
+    show(cached.listen, cached.live, cached.recent, cached.at);
   }
-  root.dataset.listenbrainzFeed = "poll";
   poll();
   connectFeed();
+
+  return {
+    subscribe(fn) {
+      subscribers.add(fn);
+      fn(snapshot, feedMode);
+    },
+    artFor,
+  };
+}
+
+const sources = new Map();
+
+function mount(root) {
+  const user = root.dataset.listenbrainzUser;
+  const cover = root.querySelector(".listenbrainz__cover");
+  const backdrop = root.querySelector(".listenbrainz__backdrop"); // backdrop variant only
+  const label = root.querySelector(".listenbrainz__label");
+  const track = root.querySelector(".listenbrainz__track");
+  const artist = root.querySelector(".listenbrainz__artist");
+  const release = root.querySelector(".listenbrainz__release");
+  let shownKey = null;
+
+  cover.addEventListener("error", () => root.classList.remove("has-art"));
+  cover.addEventListener("load", () => root.classList.add("has-art"));
+
+  function showArt({ url, tint }) {
+    if (!url) {
+      root.classList.remove("has-art");
+      cover.removeAttribute("src");
+      backdrop?.removeAttribute("src");
+    } else if (cover.getAttribute("src") !== url) {
+      root.classList.remove("has-art");
+      cover.src = url;
+      if (backdrop) backdrop.src = url;
+    }
+    if (tint) {
+      root.style.setProperty("--listenbrainz-tint", tint);
+      root.classList.add("has-tint");
+    } else {
+      root.style.removeProperty("--listenbrainz-tint");
+      root.classList.remove("has-tint");
+    }
+  }
+
+  if (!sources.has(user)) sources.set(user, createSource(user));
+  const source = sources.get(user);
+
+  source.subscribe((snap, feedMode) => {
+    root.dataset.listenbrainzFeed = feedMode;
+    root.dataset.listenbrainzState = snap.state;
+    if (!snap.listen) {
+      if (snap.state === "error") label.textContent = "Offline";
+      return; // loading / empty / error: keep the fallback markup
+    }
+    const t = snap.listen.track_metadata;
+    const info = t.additional_info || {};
+    label.textContent = snap.live ? "Now playing" : `Last played ${ago(snap.listen.listened_at)}`;
+
+    const key = trackKey(snap.listen);
+    if (key === shownKey) return;
+    shownKey = key;
+    track.replaceChildren();
+    if (info.origin_url) {
+      const a = document.createElement("a");
+      a.href = info.origin_url;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.textContent = t.track_name;
+      track.append(a);
+    } else {
+      track.textContent = t.track_name;
+    }
+    artist.textContent = t.artist_name || "";
+    release.textContent = t.release_name || "";
+    source.artFor(snap.listen, snap.recent).then((resolved) => {
+      if (shownKey === key) showArt(resolved); // else the track changed meanwhile
+    });
+  });
 }
 
 document.querySelectorAll("[data-listenbrainz-user]").forEach(mount);

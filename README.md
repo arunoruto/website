@@ -162,8 +162,13 @@ card opens the listening history; the title links to the scrobble's source.
 cover, title, artist · release; `pill` a one-line translucent badge that centres with the text
 around it (the homepage hero); `inline` the pill without the box, valid mid-sentence; `backdrop`
 fills the card with the blurred cover, tinted by its dominant colour until the art is in; `vinyl`
-drops the box and spins the cover as a record while something plays. `center="true"` caps a block
-variant at 28 rem and centres it. `content/lab/listenbrainz/` (draft-only) shows them all.
+drops the box and spins the cover as a record while something plays; `glass` is a frosted
+translucent panel with the cover's colour as an ambient glow around it. `tinted="true"` paints a
+boxed variant (`card`, `pill`, `glass`) with the cover's colour, white text on top — a no-op until
+the colour is known. `center="true"` caps a block variant at 28 rem and centres it.
+`content/lab/listenbrainz/` (draft-only) shows them all. Several cards for the same user on one
+page share a single source — one poll loop, one feed socket, one art lookup — so stacking them
+costs nothing extra (the API allows 30 requests per second-ish window per IP).
 
 Updates come from the same Socket.IO feed listenbrainz.org's own user page subscribes to, spoken
 over a bare WebSocket (no client library): a `playing_now` or `listen` event triggers a refetch, so
