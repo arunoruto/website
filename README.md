@@ -182,9 +182,15 @@ so the next page paints the known track immediately. `data-listenbrainz-feed` on
 
 Cover art: finished listens come back with a Cover Art Archive id, but a playing-now listen has no
 MusicBrainz mapping yet. `assets/js/listenbrainz.js` reuses the just-submitted listen when it is
-the same track, otherwise asks MusicBrainz (release group, then recording — scrobblers invent
-release names for YouTube uploads) and tries the first few release groups until one has art.
-Results are cached per track, so re-polls cost nothing. The cover's dominant colour is sampled on
+the same track. Otherwise it walks a chain, most authoritative first, stopping at the first cover
+that loads: ListenBrainz's own matcher (`labs.api.listenbrainz.org/acr-lookup`, public and
+keyless — the release it would map the listen to, plus that release group's cover via a plain
+MusicBrainz lookup); a MusicBrainz search (release group, then every recording of that title,
+compilations last — scrobblers invent release names for YouTube uploads); iTunes Search, filtered
+to the scrobbled artist and ranked by title so karaoke covers lose; and, as on listenbrainz.org,
+the YouTube thumbnail of the scrobbled video. Every MusicBrainz call goes through a 1 request/s
+gate per their rate-limit policy. Once ListenBrainz maps the finished listen its cover replaces the
+guess, and results are cached per track so re-polls cost nothing. The cover's dominant colour is sampled on
 a canvas (the art hosts send CORS headers) into `--listenbrainz-tint`, which the boxed variants
 glow with while playing and `backdrop` uses as its base. Styles live in `assets/css/custom.css`
 under `.listenbrainz`; states are `data-listenbrainz-state` (`loading`, `playing`, `idle`,

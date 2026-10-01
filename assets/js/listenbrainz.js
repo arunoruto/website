@@ -18,8 +18,11 @@
    Cover art: ListenBrainz resolves finished listens to MusicBrainz ids and hands
    back a Cover Art Archive id with them, but a playing-now listen has no mapping
    yet. The listen that was just submitted is usually the same track, so its art
-   is reused; otherwise a MusicBrainz search fills the gap. The cover's dominant
-   colour is sampled alongside. Results are cached per track. */
+   is reused; otherwise ListenBrainz's own matcher, a MusicBrainz search, iTunes
+   Search and finally the YouTube thumbnail are tried in turn (searchArt). Once
+   ListenBrainz maps the finished listen, its cover replaces whatever was
+   guessed. The cover's dominant colour is sampled alongside. Results are
+   cached per track. */
 
 const API = "https://api.listenbrainz.org/1/user/";
 const FEED = "wss://listenbrainz.org/socket.io/?EIO=4&transport=websocket";
@@ -55,31 +58,124 @@ function mappedArt(listen) {
   return `https://archive.org/download/mbid-${m.caa_release_mbid}/mbid-${m.caa_release_mbid}-${m.caa_id}_thumb250.jpg`;
 }
 
-/* Lucene queries against MusicBrainz (CORS-enabled, be polite: 1 req/s). The
-   release name is tried first; scrobblers often invent one (YouTube uploads),
-   so the recording itself is the fallback and its first release's group wins. */
+/* MusicBrainz web service (CORS-enabled). Its policy is one request per
+   second per client, so every call - lookup or search - goes through a shared
+   gate that spaces them out. Browsers do not let scripts set User-Agent, so the
+   visitor's browser identifies itself; each visitor has their own budget. */
 const quote = (s) => `"${s.replace(/["\\]/g, " ")}"`;
+let musicbrainzFreeAt = 0;
 
-async function search(entity, query) {
-  const url = `https://musicbrainz.org/ws/2/${entity}/?query=${encodeURIComponent(query)}&fmt=json&limit=1`;
-  return getJSON(url);
+async function musicbrainz(path) {
+  const wait = musicbrainzFreeAt - Date.now();
+  musicbrainzFreeAt = Math.max(Date.now(), musicbrainzFreeAt) + 1_100;
+  if (wait > 0) await new Promise((resolve) => setTimeout(resolve, wait));
+  return getJSON(`https://musicbrainz.org/ws/2/${path}${path.includes("?") ? "&" : "?"}fmt=json`);
 }
 
-/* Candidate cover URLs, best guess first; not every release group has art. */
-async function searchArt(listen) {
+const search = (entity, query, limit) =>
+  musicbrainz(`${entity}/?query=${encodeURIComponent(query)}&limit=${limit}`);
+
+const caa = (kind, mbid) => `https://coverartarchive.org/${kind}/${mbid}/front-250`;
+
+/* ListenBrainz's own matcher, the one that maps finished listens: public,
+   keyless, CORS-open, and given artist + title it returns the release it would
+   pick. That release often has no scan of its own while another edition does,
+   so its release group's cover (which the Cover Art Archive resolves to the
+   best edition with art, as ListenBrainz's caa_release_mbid does) comes too,
+   via a plain MusicBrainz lookup rather than a search. */
+async function listenbrainzMatchArt(listen) {
+  const t = listen.track_metadata;
+  if (!t.artist_name || !t.track_name) return [];
+  const query = `artist_credit_name=${encodeURIComponent(t.artist_name)}&recording_name=${encodeURIComponent(t.track_name)}`;
+  const [match] = await getJSON(`https://labs.api.listenbrainz.org/acr-lookup/json?${query}`);
+  if (!match?.release_mbid) return [];
+  const release = await musicbrainz(`release/${match.release_mbid}?inc=release-groups`).catch(() => null);
+  const group = release?.["release-group"]?.id;
+  return [caa("release", match.release_mbid), ...(group ? [caa("release-group", group)] : [])];
+}
+
+/* Release groups that could carry the cover, from the release name first
+   (scrobblers often invent one for YouTube uploads, then nothing matches) and
+   otherwise from every recording of that title by that artist. Compilations go
+   last: a "Promo Only" sampler rarely shows the track's own artwork. */
+async function musicbrainzArt(listen) {
   const t = listen.track_metadata;
   if (!t.artist_name) return [];
   const groups = [];
   if (t.release_name) {
-    const data = await search("release-group", `releasegroup:${quote(t.release_name)} AND artist:${quote(t.artist_name)}`);
-    for (const g of data["release-groups"] || []) groups.push(g.id);
+    const data = await search("release-group", `releasegroup:${quote(t.release_name)} AND artist:${quote(t.artist_name)}`, 3);
+    for (const g of data["release-groups"] || []) groups.push({ id: g.id, compilation: false });
   }
   if (!groups.length && t.track_name) {
-    const data = await search("recording", `recording:${quote(t.track_name)} AND artist:${quote(t.artist_name)}`);
-    for (const r of data.recordings?.[0]?.releases || []) groups.push(r["release-group"]?.id);
+    const data = await search("recording", `recording:${quote(t.track_name)} AND artist:${quote(t.artist_name)}`, 5);
+    for (const recording of data.recordings || []) {
+      for (const release of recording.releases || []) {
+        const group = release["release-group"];
+        if (group?.id) groups.push({ id: group.id, compilation: (group["secondary-types"] || []).includes("Compilation") });
+      }
+    }
   }
-  return [...new Set(groups.filter(Boolean))].slice(0, 4)
-    .map((id) => `https://coverartarchive.org/release-group/${id}/front-250`);
+  const seen = new Set();
+  return groups
+    .sort((a, b) => a.compilation - b.compilation)
+    .filter((g) => !seen.has(g.id) && seen.add(g.id))
+    .slice(0, 4)
+    .map((g) => caa("release-group", g.id));
+}
+
+/* iTunes Search as the last resort: keyless, CORS-open (search and images
+   alike) and far better stocked with singles and remixes than the Cover Art
+   Archive. Results are kept to the scrobbled artist and ranked by how well the
+   title matches, so a karaoke cover of the track does not win; the remix
+   suffix is dropped for the second-best match since the original's artwork is
+   close enough. */
+const norm = (s) => (s || "").toLowerCase().normalize("NFKD").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+const baseTitle = (s) => norm((s || "").replace(/\s*[([].*?[)\]]/g, ""));
+
+async function itunesArt(listen) {
+  const t = listen.track_metadata;
+  if (!t.artist_name || !t.track_name) return [];
+  const url = `https://itunes.apple.com/search?term=${encodeURIComponent(`${t.artist_name} ${t.track_name}`)}&entity=song&limit=10`;
+  const data = await getJSON(url);
+  const artist = norm(t.artist_name);
+  const title = norm(t.track_name);
+  const base = baseTitle(t.track_name);
+  return (data.results || [])
+    .filter((r) => {
+      const a = norm(r.artistName);
+      return a && (a.includes(artist) || artist.includes(a));
+    })
+    .map((r) => {
+      const n = norm(r.trackName);
+      const score = n === title ? 3 : baseTitle(r.trackName) === base ? 2 : n.includes(base) ? 1 : 0;
+      return { r, score };
+    })
+    .filter((x) => x.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 2)
+    .map(({ r }) => r.artworkUrl100.replace("100x100bb", "300x300bb"));
+}
+
+/* Last resort, as on listenbrainz.org itself: the thumbnail of the YouTube
+   video the scrobble came from (i.ytimg.com is CORS-open). mqdefault is 16:9
+   without letterbox bars, so object-fit: cover crops it cleanly. */
+function youtubeArt(listen) {
+  const origin = listen.track_metadata.additional_info?.origin_url || "";
+  const id = origin.match(/(?:youtu\.be\/|[?&]v=|\/shorts\/)([\w-]{11})/)?.[1];
+  return id ? [`https://i.ytimg.com/vi/${id}/mqdefault.jpg`] : [];
+}
+
+/* Candidate cover URLs for a listen ListenBrainz has not mapped yet (playing
+   now), most authoritative first; each is probed until one loads. MusicBrainz
+   is asked first and politely; iTunes only when it has nothing. */
+async function searchArt(listen) {
+  const sources = [listenbrainzMatchArt, musicbrainzArt, itunesArt];
+  for (const find of sources) {
+    const urls = await find(listen).catch(() => []);
+    const hit = await firstLoadable(urls);
+    if (hit) return hit;
+  }
+  return firstLoadable(youtubeArt(listen));
 }
 
 /* Resolves to the first URL that actually loads as an image, else null. */
@@ -214,17 +310,21 @@ function createSource(user) {
     for (const fn of subscribers) fn(snapshot, feedMode);
   }
 
+  /* ListenBrainz's own mapping arrives once a listen is finished; it always
+     wins, replacing an earlier guess or a cached "no cover" for that track. */
   function artFor(listen, recent) {
     const key = trackKey(listen);
-    if (!art.has(key)) {
-      art.set(key, (async () => {
-        let url = mappedArt(listen);
-        if (!url && recent && trackKey(recent) === key) url = mappedArt(recent);
-        if (!url) url = await searchArt(listen).then(firstLoadable).catch(() => null);
+    const mapped = mappedArt(listen) || (recent && trackKey(recent) === key ? mappedArt(recent) : null);
+    const known = art.get(key);
+    if (!known || (mapped && known.mapped !== mapped)) {
+      const promise = (async () => {
+        const url = mapped || await searchArt(listen).catch(() => null);
         const tint = url ? await sampleTint(url) : null;
         return { url, tint };
-      })());
-      art.get(key).then(writeCache); // the snapshot carries the art once known
+      })();
+      promise.mapped = mapped;
+      art.set(key, promise);
+      promise.then(writeCache); // the snapshot carries the art once known
     }
     return art.get(key);
   }
@@ -348,7 +448,11 @@ function createSource(user) {
 
   const cached = readCache();
   if (cached) {
-    if (cached.art && typeof cached.art === "object") art.set(trackKey(cached.listen), Promise.resolve(cached.art));
+    if (cached.art && typeof cached.art === "object") {
+      const promise = Promise.resolve(cached.art);
+      promise.mapped = mappedArt(cached.listen) || (cached.recent ? mappedArt(cached.recent) : null);
+      art.set(trackKey(cached.listen), promise);
+    }
     show(cached.listen, cached.live, cached.recent, cached.at);
   }
   poll();
@@ -412,6 +516,11 @@ function mount(root) {
     label.textContent = snap.live ? "Now playing" : `Last played ${ago(snap.listen.listened_at)}`;
 
     const key = trackKey(snap.listen);
+    // Every snapshot re-asks: cached, it costs nothing, and a cover ListenBrainz
+    // mapped after the track ended replaces the earlier guess or gap.
+    source.artFor(snap.listen, snap.recent).then((resolved) => {
+      if (shownKey === key) showArt(resolved); // else the track changed meanwhile
+    });
     if (key === shownKey) return;
     shownKey = key;
     track.replaceChildren();
@@ -427,9 +536,6 @@ function mount(root) {
     }
     artist.textContent = t.artist_name || "";
     release.textContent = t.release_name || "";
-    source.artFor(snap.listen, snap.recent).then((resolved) => {
-      if (shownKey === key) showArt(resolved); // else the track changed meanwhile
-    });
   });
 }
 
