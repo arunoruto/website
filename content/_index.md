@@ -14,7 +14,7 @@ heroButtons:
     style: "outline"
 ---
 
-{{< listenbrainz user="arunoruto" variant="pill" >}}
+{{< listenbrainz user="arunoruto" variant="pill" background="cover" >}}
 
 {{< feature-grid >}}
 {{< feature icon="graduation-cap" title="Research @ TU Dortmund" url="/publications/" label="See the publications" >}}
