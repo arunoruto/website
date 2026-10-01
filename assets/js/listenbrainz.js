@@ -93,6 +93,46 @@ function firstLoadable(urls) {
   );
 }
 
+/* Dominant colour of the cover as "r g b", weighted towards saturated pixels so
+   a mostly white sleeve with a red logo tints red. Needs CORS on the image host
+   (the Cover Art Archive and archive.org send it); otherwise null, no tint. */
+function sampleTint(url) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onerror = () => resolve(null);
+    img.onload = () => {
+      try {
+        const n = 12;
+        const canvas = document.createElement("canvas");
+        canvas.width = canvas.height = n;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        ctx.drawImage(img, 0, 0, n, n);
+        const { data } = ctx.getImageData(0, 0, n, n);
+        let r = 0, g = 0, b = 0, w = 0;
+        for (let i = 0; i < data.length; i += 4) {
+          const max = Math.max(data[i], data[i + 1], data[i + 2]);
+          const min = Math.min(data[i], data[i + 1], data[i + 2]);
+          const sat = max ? (max - min) / max : 0;
+          const weight = 0.05 + sat * sat;
+          r += data[i] * weight;
+          g += data[i + 1] * weight;
+          b += data[i + 2] * weight;
+          w += weight;
+        }
+        // Lift near-black sleeves so the tint still reads as a colour, keeping the hue.
+        const rgb = [r, g, b].map((c) => c / w);
+        const peak = Math.max(...rgb);
+        const lift = peak < 96 ? 96 / Math.max(peak, 1) : 1;
+        resolve(rgb.map((c) => Math.round(Math.min(255, c * lift))).join(" "));
+      } catch {
+        resolve(null); // tainted canvas
+      }
+    };
+    img.src = url;
+  });
+}
+
 const relative = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
 
 function ago(unixSeconds) {
@@ -156,11 +196,12 @@ function mount(root) {
   const base = API + encodeURIComponent(user);
   const cacheKey = `listenbrainz:${user}`;
   const cover = root.querySelector(".listenbrainz__cover");
+  const backdrop = root.querySelector(".listenbrainz__backdrop"); // backdrop variant only
   const label = root.querySelector(".listenbrainz__label");
   const track = root.querySelector(".listenbrainz__track");
   const artist = root.querySelector(".listenbrainz__artist");
   const release = root.querySelector(".listenbrainz__release");
-  const artCache = new Map();
+  const artCache = new Map(); // track key -> { url, tint }, both nullable
   let shownKey = null;
   let current = null; // { live, listen, recent } behind what is on screen
   let endGuess = null; // when the live track should be over (ms epoch)
@@ -193,16 +234,26 @@ function mount(root) {
       let url = mappedArt(listen);
       if (!url && recent && trackKey(recent) === key) url = mappedArt(recent);
       if (!url) url = await searchArt(listen).then(firstLoadable).catch(() => null);
-      artCache.set(key, url);
+      const tint = url ? await sampleTint(url) : null;
+      artCache.set(key, { url, tint });
     }
-    const url = artCache.get(key);
+    const { url, tint } = artCache.get(key);
     if (shownKey !== key) return; // the track changed while we were searching
     if (!url) {
       root.classList.remove("has-art");
       cover.removeAttribute("src");
+      backdrop?.removeAttribute("src");
     } else if (cover.getAttribute("src") !== url) {
       root.classList.remove("has-art");
       cover.src = url;
+      if (backdrop) backdrop.src = url;
+    }
+    if (tint) {
+      root.style.setProperty("--listenbrainz-tint", tint);
+      root.classList.add("has-tint");
+    } else {
+      root.style.removeProperty("--listenbrainz-tint");
+      root.classList.remove("has-tint");
     }
     writeCache();
   }
@@ -320,7 +371,7 @@ function mount(root) {
 
   const cached = readCache();
   if (cached) {
-    if (cached.art) artCache.set(trackKey(cached.listen), cached.art);
+    if (cached.art && typeof cached.art === "object") artCache.set(trackKey(cached.listen), cached.art);
     render(cached.listen, cached.live, cached.recent, cached.at);
   }
   root.dataset.listenbrainzFeed = "poll";

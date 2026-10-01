@@ -100,6 +100,7 @@
 }
 
 .listenbrainz__body {
+  position: relative; /* stacks above the backdrop image, below the stretched link */
   min-width: 0;
   flex: 1;
 }
@@ -128,6 +129,7 @@
 
 .listenbrainz__track,
 .listenbrainz__meta {
+  display: block; /* spans, so the inline variant is valid inside a paragraph */
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -162,6 +164,7 @@
 }
 
 .listenbrainz__profile {
+  position: relative;
   flex: none;
   width: 1.5rem;
   height: 1.5rem;
@@ -223,20 +226,32 @@
   margin-right: auto;
 }
 
-/* variant="pill": a single-line status badge. inline-flex so it follows the
-   parent's text-align (centred in the homepage hero), translucent so the hero
-   background shows through. Release name is dropped to keep it to one line. */
-.listenbrainz--pill {
+/* The script samples the cover's dominant colour into --listenbrainz-tint
+   ("r g b") and sets .has-tint; boxed variants glow with it while playing. */
+.listenbrainz--card.has-tint[data-listenbrainz-state="playing"],
+.listenbrainz--pill.has-tint[data-listenbrainz-state="playing"] {
+  box-shadow: 0 12px 32px -18px rgb(var(--listenbrainz-tint) / 0.9);
+}
+
+/* variant="pill" and variant="inline": one line. inline-flex so they follow the
+   parent's text-align (centred in the homepage hero) or sit inside a sentence.
+   The pill is a translucent badge, inline is the bare text. Release name is
+   dropped to keep it to one line. */
+.listenbrainz--pill,
+.listenbrainz--inline {
   display: inline-flex;
   max-width: 100%;
+  font-size: 0.9rem;
+  text-align: left;
+}
+
+.listenbrainz--pill {
   margin: 0.75rem auto;
   padding: 0.3rem 0.9rem 0.3rem 0.3rem;
   border-radius: 999px;
   background: rgba(var(--color-neutral), 0.65);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  font-size: 0.9rem;
-  text-align: left;
 }
 
 .dark .listenbrainz--pill {
@@ -251,58 +266,213 @@
   background: rgba(var(--color-neutral-800), 0.8);
 }
 
-.listenbrainz--pill .listenbrainz__art {
+.listenbrainz--inline {
+  margin: 0;
+  padding: 0;
+  gap: 0.5rem;
+  border: 0;
+  border-radius: 0.25rem;
+  background: none;
+  vertical-align: middle;
+  font-size: inherit;
+}
+
+.listenbrainz--pill .listenbrainz__art,
+.listenbrainz--inline .listenbrainz__art {
   width: 2rem;
   height: 2rem;
   border-radius: 999px;
 }
 
-.listenbrainz--pill .listenbrainz__disc {
-  padding: 0.35rem;
+.listenbrainz--inline .listenbrainz__art {
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
-.listenbrainz--pill .listenbrainz__body {
+.listenbrainz--pill .listenbrainz__disc,
+.listenbrainz--inline .listenbrainz__disc {
+  padding: 0.3rem;
+}
+
+.listenbrainz--pill .listenbrainz__body,
+.listenbrainz--inline .listenbrainz__body {
   display: flex;
   align-items: baseline;
   gap: 0.5rem;
-  margin-left: -0.35rem;
   overflow: hidden;
 }
 
-.listenbrainz--pill .listenbrainz__status {
+.listenbrainz--pill .listenbrainz__body {
+  margin-left: -0.35rem;
+}
+
+.listenbrainz--pill .listenbrainz__status,
+.listenbrainz--inline .listenbrainz__status {
   flex: none;
   align-self: center;
   font-size: 0.7rem;
 }
 
-.listenbrainz--pill .listenbrainz__track {
+.listenbrainz--pill .listenbrainz__track,
+.listenbrainz--inline .listenbrainz__track {
   margin-top: 0;
   flex: none;
   max-width: 18rem;
   font-weight: 600;
 }
 
-.listenbrainz--pill .listenbrainz__meta {
+.listenbrainz--pill .listenbrainz__meta,
+.listenbrainz--inline .listenbrainz__meta {
   flex: 1;
   min-width: 0;
   font-size: inherit;
 }
 
-.listenbrainz--pill .listenbrainz__meta::before {
+.listenbrainz--pill .listenbrainz__meta::before,
+.listenbrainz--inline .listenbrainz__meta::before {
   content: "— ";
 }
 
-.listenbrainz--pill .listenbrainz__release {
-  display: none;
-}
-
-.listenbrainz--pill .listenbrainz__profile {
-  display: none;
+.listenbrainz--pill .listenbrainz__release,
+.listenbrainz--inline .listenbrainz__release,
+.listenbrainz--pill .listenbrainz__profile,
+.listenbrainz--inline .listenbrainz__profile,
+.listenbrainz--inline[data-listenbrainz-state="playing"] .listenbrainz__label {
+  display: none; /* mid-sentence, the bars alone say "playing" */
 }
 
 @media (max-width: 640px) {
   .listenbrainz--pill .listenbrainz__status .listenbrainz__label {
     display: none; /* bars alone say "playing" on a phone */
+  }
+}
+
+/* variant="backdrop": the cover, blurred and darkened, fills the card. The
+   sampled tint stands in until the art is loaded (or when there is none), so
+   the card is always light-on-dark whatever the scheme. The backdrop image is
+   the first child; everything else is positioned so DOM order stacks it on
+   top, with the stretched link last and the title link above that. */
+.listenbrainz--backdrop {
+  overflow: hidden;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  border: 0;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, rgb(var(--listenbrainz-tint, 70 80 110)), rgb(var(--color-neutral-900)));
+  color: #fff;
+  box-shadow: 0 24px 48px -28px rgb(var(--listenbrainz-tint, 0 0 0) / 0.9);
+}
+
+.listenbrainz__backdrop {
+  position: absolute;
+  inset: -25%;
+  width: 150%;
+  height: 150%;
+  margin: 0;
+  object-fit: cover;
+  opacity: 0;
+  filter: blur(32px) saturate(1.6) brightness(0.55);
+  transition: opacity 600ms;
+  pointer-events: none;
+}
+
+.listenbrainz.has-art .listenbrainz__backdrop {
+  opacity: 1;
+}
+
+.listenbrainz--backdrop .listenbrainz__art {
+  position: relative;
+  width: 5.5rem;
+  height: 5.5rem;
+  background: rgb(255 255 255 / 0.12);
+  color: rgb(255 255 255 / 0.5);
+  box-shadow: 0 10px 28px -8px rgb(0 0 0 / 0.7);
+}
+
+.listenbrainz--backdrop .listenbrainz__track {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.listenbrainz--backdrop .listenbrainz__track a,
+.dark .listenbrainz--backdrop .listenbrainz__track a {
+  color: #fff;
+}
+
+.listenbrainz--backdrop .listenbrainz__status,
+.dark .listenbrainz--backdrop .listenbrainz__status,
+.listenbrainz--backdrop[data-listenbrainz-state="playing"] .listenbrainz__status,
+.dark .listenbrainz--backdrop[data-listenbrainz-state="playing"] .listenbrainz__status {
+  color: rgb(255 255 255 / 0.75);
+}
+
+.listenbrainz--backdrop .listenbrainz__meta,
+.dark .listenbrainz--backdrop .listenbrainz__meta {
+  color: rgb(255 255 255 / 0.8);
+}
+
+.listenbrainz--backdrop .listenbrainz__profile,
+.listenbrainz--backdrop:hover .listenbrainz__profile {
+  color: rgb(255 255 255 / 0.6);
+}
+
+.listenbrainz--backdrop:hover .listenbrainz__profile {
+  color: #fff;
+}
+
+/* variant="vinyl": no box; the cover is a record with a spindle hole that
+   spins while something is playing and stops where it was otherwise. */
+.listenbrainz--vinyl {
+  gap: 1.25rem;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.listenbrainz--vinyl .listenbrainz__art {
+  width: 5.5rem;
+  height: 5.5rem;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 3px rgb(var(--color-neutral-900) / 0.9),
+    0 0 0 4px rgb(var(--color-neutral-500) / 0.5),
+    0 12px 24px -12px rgb(0 0 0 / 0.7);
+  animation: listenbrainz-spin 6s linear infinite;
+  animation-play-state: paused;
+}
+
+.listenbrainz--vinyl[data-listenbrainz-state="playing"] .listenbrainz__art {
+  animation-play-state: running;
+}
+
+.listenbrainz--vinyl .listenbrainz__art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 1rem;
+  height: 1rem;
+  margin: auto;
+  border-radius: 50%;
+  background: rgb(var(--color-neutral-900));
+  box-shadow: 0 0 0 2px rgb(var(--color-neutral-300) / 0.6);
+}
+
+.listenbrainz--vinyl .listenbrainz__cover {
+  border-radius: 50%;
+}
+
+.listenbrainz--vinyl .listenbrainz__track {
+  font-size: 1.05rem;
+}
+
+@keyframes listenbrainz-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .listenbrainz--vinyl .listenbrainz__art {
+    animation: none;
   }
 }
 

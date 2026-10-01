@@ -155,9 +155,15 @@ Math: drop `{{< katex >}}` into the post once; `\(…\)` inline and `$$…$$` bl
 `{{< listenbrainz user="arunoruto" >}}` renders a "now playing / last played" card fed by the
 public [ListenBrainz](https://listenbrainz.org) API. Nothing happens at build time: the visitor's
 browser fetches `playing-now` and the latest listen (the API is CORS-open and needs no key), and
-the shortcode's markup doubles as the no-JS fallback — a plain link to the profile. The homepage
-uses `variant="pill"`, a one-line badge that centres with the hero text; `center="true"` caps the
-default card at 28 rem for use outside prose.
+the shortcode's markup doubles as the no-JS fallback — a plain link to the profile. Clicking the
+card opens the listening history; the title links to the scrobble's source.
+
+`variant` picks the look (same markup and script, CSS only): `card` (default) is a boxed row with
+cover, title, artist · release; `pill` a one-line translucent badge that centres with the text
+around it (the homepage hero); `inline` the pill without the box, valid mid-sentence; `backdrop`
+fills the card with the blurred cover, tinted by its dominant colour until the art is in; `vinyl`
+drops the box and spins the cover as a record while something plays. `center="true"` caps a block
+variant at 28 rem and centres it. `content/lab/listenbrainz/` (draft-only) shows them all.
 
 Updates come from the same Socket.IO feed listenbrainz.org's own user page subscribes to, spoken
 over a bare WebSocket (no client library): a `playing_now` or `listen` event triggers a refetch, so
@@ -172,7 +178,9 @@ Cover art: finished listens come back with a Cover Art Archive id, but a playing
 MusicBrainz mapping yet. `assets/js/listenbrainz.js` reuses the just-submitted listen when it is
 the same track, otherwise asks MusicBrainz (release group, then recording — scrobblers invent
 release names for YouTube uploads) and tries the first few release groups until one has art.
-Results are cached per track, so re-polls cost nothing. Styles live in `assets/css/custom.css`
+Results are cached per track, so re-polls cost nothing. The cover's dominant colour is sampled on
+a canvas (the art hosts send CORS headers) into `--listenbrainz-tint`, which the boxed variants
+glow with while playing and `backdrop` uses as its base. Styles live in `assets/css/custom.css`
 under `.listenbrainz`; states are `data-listenbrainz-state` (`loading`, `playing`, `idle`,
 `empty`, `error`).
 
