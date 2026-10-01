@@ -14,6 +14,8 @@ heroButtons:
     style: "outline"
 ---
 
+{{< listenbrainz user="arunoruto" variant="pill" >}}
+
 {{< feature-grid >}}
 {{< feature icon="graduation-cap" title="Research @ TU Dortmund" url="/publications/" label="See the publications" >}}
 Light scattering with the T-matrix method, polarimetry, and micro-polarizer array filters — modelling how planetary regolith reflects what we point at it.

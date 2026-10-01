@@ -11,6 +11,271 @@
   margin: 0;
 }
 
+/* "Now playing" card from layouts/shortcodes/listenbrainz.html, filled in by
+   assets/js/listenbrainz.js. States (data-listenbrainz-state): loading, playing,
+   idle (last played), empty, error - the equaliser only runs while playing. */
+.listenbrainz {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.5rem 0;
+  padding: 0.75rem;
+  border: 1px solid rgba(var(--color-neutral-200), 1);
+  border-radius: 0.75rem;
+  background: rgba(var(--color-neutral-50), 1);
+  line-height: 1.35;
+  text-align: left;
+}
+
+.dark .listenbrainz {
+  border-color: rgba(var(--color-neutral-700), 1);
+  background: rgba(var(--color-neutral-800), 0.6);
+}
+
+.listenbrainz__art {
+  position: relative;
+  flex: none;
+  width: 4.5rem;
+  height: 4.5rem;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  background: rgba(var(--color-neutral-200), 1);
+  color: rgba(var(--color-neutral-400), 1);
+}
+
+.dark .listenbrainz__art {
+  background: rgba(var(--color-neutral-700), 1);
+  color: rgba(var(--color-neutral-500), 1);
+}
+
+.listenbrainz__cover,
+.listenbrainz__disc {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  border-radius: 0;
+}
+
+.listenbrainz__disc {
+  padding: 1rem;
+}
+
+.listenbrainz__cover {
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 300ms;
+}
+
+.listenbrainz.has-art .listenbrainz__cover {
+  opacity: 1;
+}
+
+.listenbrainz.has-art .listenbrainz__disc {
+  display: none;
+}
+
+.listenbrainz__body {
+  min-width: 0;
+  flex: 1;
+}
+
+.listenbrainz__status {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(var(--color-neutral-500), 1);
+}
+
+.dark .listenbrainz__status {
+  color: rgba(var(--color-neutral-400), 1);
+}
+
+.listenbrainz[data-listenbrainz-state="playing"] .listenbrainz__status {
+  color: rgb(var(--color-primary-600));
+}
+
+.dark .listenbrainz[data-listenbrainz-state="playing"] .listenbrainz__status {
+  color: rgb(var(--color-primary-400));
+}
+
+.listenbrainz__track,
+.listenbrainz__meta {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.listenbrainz__track {
+  margin-top: 0.15rem;
+  font-weight: 600;
+}
+
+.listenbrainz__track a {
+  text-decoration: none;
+}
+
+.listenbrainz__track a:hover {
+  text-decoration: underline;
+}
+
+.listenbrainz__meta {
+  font-size: 0.9rem;
+  color: rgba(var(--color-neutral-600), 1);
+}
+
+.listenbrainz__release:not(:empty)::before {
+  content: " · ";
+}
+
+.dark .listenbrainz__meta {
+  color: rgba(var(--color-neutral-400), 1);
+}
+
+.listenbrainz__profile {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-right: 0.25rem;
+  color: rgba(var(--color-neutral-400), 1);
+}
+
+.listenbrainz__profile svg {
+  width: 100%;
+  height: 100%;
+}
+
+.listenbrainz__profile:hover {
+  color: rgb(var(--color-primary-500));
+}
+
+/* Three bars bouncing out of phase, the classic "it's alive" badge. */
+.listenbrainz__eq {
+  display: none;
+  align-items: flex-end;
+  gap: 2px;
+  width: 12px;
+  height: 11px;
+}
+
+.listenbrainz[data-listenbrainz-state="playing"] .listenbrainz__eq {
+  display: inline-flex;
+}
+
+.listenbrainz__eq i {
+  flex: 1;
+  height: 40%;
+  background: currentColor;
+  border-radius: 1px;
+  animation: listenbrainz-eq 0.9s ease-in-out infinite alternate;
+}
+
+.listenbrainz__eq i:nth-child(2) { animation-delay: -0.3s; }
+.listenbrainz__eq i:nth-child(3) { animation-delay: -0.6s; }
+
+@keyframes listenbrainz-eq {
+  from { height: 25%; }
+  to { height: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .listenbrainz__eq i {
+    animation: none;
+    height: 70%;
+  }
+}
+
+.listenbrainz[data-listenbrainz-state="error"] .listenbrainz__label::after {
+  content: " (offline)";
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.listenbrainz--center {
+  max-width: 28rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* variant="pill": a single-line status badge. inline-flex so it follows the
+   parent's text-align (centred in the homepage hero), translucent so the hero
+   background shows through. Release name is dropped to keep it to one line. */
+.listenbrainz--pill {
+  display: inline-flex;
+  max-width: 100%;
+  margin: 0.75rem auto;
+  padding: 0.3rem 0.9rem 0.3rem 0.3rem;
+  border-radius: 999px;
+  background: rgba(var(--color-neutral), 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font-size: 0.9rem;
+  text-align: left;
+}
+
+.dark .listenbrainz--pill {
+  background: rgba(var(--color-neutral-800), 0.55);
+}
+
+.listenbrainz--pill .listenbrainz__art {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+}
+
+.listenbrainz--pill .listenbrainz__disc {
+  padding: 0.35rem;
+}
+
+.listenbrainz--pill .listenbrainz__body {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-left: -0.35rem;
+  overflow: hidden;
+}
+
+.listenbrainz--pill .listenbrainz__status {
+  flex: none;
+  align-self: center;
+  font-size: 0.7rem;
+}
+
+.listenbrainz--pill .listenbrainz__track {
+  margin-top: 0;
+  flex: none;
+  max-width: 18rem;
+  font-weight: 600;
+}
+
+.listenbrainz--pill .listenbrainz__meta {
+  flex: 1;
+  min-width: 0;
+  font-size: inherit;
+}
+
+.listenbrainz--pill .listenbrainz__meta::before {
+  content: "— ";
+}
+
+.listenbrainz--pill .listenbrainz__release {
+  display: none;
+}
+
+.listenbrainz--pill .listenbrainz__profile {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .listenbrainz--pill .listenbrainz__status .listenbrainz__label {
+    display: none; /* bars alone say "playing" on a phone */
+  }
+}
+
 /* Interactive figures rendered by layouts/shortcodes/viz.html and driven by
    assets/js/viz/. Colours come from the Blowfish scheme's RGB-triplet variables
    so widgets follow the appearance switcher without any extra dark: rules. */

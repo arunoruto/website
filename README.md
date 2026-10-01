@@ -150,6 +150,23 @@ Wide pages: `wideLayout: true` in a post's front matter loosens the prose column
 Math: drop `{{< katex >}}` into the post once; `\(…\)` inline and `$$…$$` blocks work
 (`config/_default/markup.toml` enables Goldmark passthrough so Markdown leaves the TeX alone).
 
+## 🎧 Now playing
+
+`{{< listenbrainz user="arunoruto" >}}` renders a "now playing / last played" card fed by the
+public [ListenBrainz](https://listenbrainz.org) API. Nothing happens at build time: the visitor's
+browser polls `playing-now` and the latest listen every 30 s while the tab is visible (the API is
+CORS-open and needs no key), and the shortcode's markup doubles as the no-JS fallback — a plain
+link to the profile. The homepage uses `variant="pill"`, a one-line badge that centres with the
+hero text; `center="true"` caps the default card at 28 rem for use outside prose.
+
+Cover art: finished listens come back with a Cover Art Archive id, but a playing-now listen has no
+MusicBrainz mapping yet. `assets/js/listenbrainz.js` reuses the just-submitted listen when it is
+the same track, otherwise asks MusicBrainz (release group, then recording — scrobblers invent
+release names for YouTube uploads) and tries the first few release groups until one has art.
+Results are cached per track, so re-polls cost nothing. Styles live in `assets/css/custom.css`
+under `.listenbrainz`; states are `data-listenbrainz-state` (`loading`, `playing`, `idle`,
+`empty`, `error`).
+
 ## 🚢 Deployment
 
 Cloudflare Pages builds from the Git integration on every push to `main`; the build command and

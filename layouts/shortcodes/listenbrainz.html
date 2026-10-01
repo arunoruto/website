@@ -1,0 +1,55 @@
+{{/*  "Now playing" card fed by the public ListenBrainz API (no key: the API sends
+      Access-Control-Allow-Origin: * and playing-now/listens need no auth), so the
+      visitor's browser polls it directly - nothing runs at build time. The markup
+      below is the no-JS fallback (a plain link to the profile); assets/js/
+      listenbrainz.js fills it in and keeps it fresh while the tab is visible.
+
+      Usage:
+        {{< listenbrainz user="arunoruto" >}}
+        {{< listenbrainz user="arunoruto" variant="pill" >}}
+
+      Params:
+        user     ListenBrainz user name (default: site.Params.listenbrainz.user)
+        variant  "card" (default): boxed row with cover art, title, artist · release
+                 "pill": one-line badge that centres with the surrounding text,
+                         meant for the homepage hero
+        center   "true" centres the card variant and caps it at 28rem  */}}
+{{- $user := .Get "user" | default site.Params.listenbrainz.user -}}
+{{- if not $user -}}
+  {{- errorf "listenbrainz shortcode: user is required, or set params.listenbrainz.user (%s)" .Position -}}
+{{- end -}}
+{{- $variant := .Get "variant" | default "card" -}}
+{{- if not (in (slice "card" "pill") $variant) -}}
+  {{- errorf "listenbrainz shortcode: variant must be card or pill, got %q (%s)" $variant .Position -}}
+{{- end -}}
+{{- $center := in (slice "true" "1" "yes" "on") (lower (.Get "center" | default "false")) -}}
+{{- $profile := printf "https://listenbrainz.org/user/%s/" $user -}}
+
+{{- $opts := dict
+  "format" "esm"
+  "target" "es2020"
+  "minify" hugo.IsProduction
+  "sourceMap" (cond hugo.IsProduction "" "inline")
+-}}
+{{- $js := resources.Get "js/listenbrainz.js" | js.Build $opts | resources.Fingerprint (site.Params.fingerprintAlgorithm | default "sha512") -}}
+
+<div class="listenbrainz listenbrainz--{{ $variant }}{{ if $center }} listenbrainz--center{{ end }}" data-listenbrainz-user="{{ $user }}" data-listenbrainz-state="loading">
+  <div class="listenbrainz__art" aria-hidden="true">
+    <img class="listenbrainz__cover" alt="" decoding="async">
+    <svg class="listenbrainz__disc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <circle cx="12" cy="12" r="9.5"/><circle cx="12" cy="12" r="5.5" stroke-dasharray="2 2.5"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/>
+    </svg>
+  </div>
+  <div class="listenbrainz__body">
+    <div class="listenbrainz__status">
+      <span class="listenbrainz__eq" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="listenbrainz__label">Now playing</span>
+    </div>
+    <div class="listenbrainz__track"><a href="{{ $profile }}" rel="noopener">What I’m listening to</a></div>
+    <div class="listenbrainz__meta"><span class="listenbrainz__artist">on ListenBrainz</span><span class="listenbrainz__release"></span></div>
+  </div>
+  <a class="listenbrainz__profile" href="{{ $profile }}" rel="noopener" title="My ListenBrainz profile">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V6l11-2v12"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>
+  </a>
+</div>
+<script type="module" src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" crossorigin="anonymous"></script>
