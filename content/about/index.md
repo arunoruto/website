@@ -28,4 +28,4 @@ layoutBackgroundHeaderSpace: false
 
 Scrobbled straight from my browser via [ListenBrainz](https://listenbrainz.org/user/arunoruto/) — if the bars are moving, something is playing right now.
 
-{{< listenbrainz user="arunoruto" >}}
+{{< listenbrainz user="arunoruto" background="cover" >}}
