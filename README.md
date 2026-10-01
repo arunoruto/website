@@ -158,14 +158,15 @@ browser fetches `playing-now` and the latest listen (the API is CORS-open and ne
 the shortcode's markup doubles as the no-JS fallback — a plain link to the profile. Clicking the
 card opens the listening history; the title links to the scrobble's source.
 
-`variant` picks the look (same markup and script, CSS only): `card` (default) is a boxed row with
+`variant` picks the layout (same markup and script, CSS only): `card` (default) is a boxed row with
 cover, title, artist · release; `pill` a one-line translucent badge that centres with the text
-around it (the homepage hero); `inline` the pill without the box, valid mid-sentence; `backdrop`
-fills the card with the blurred cover, tinted by its dominant colour until the art is in; `vinyl`
+around it (the homepage hero); `inline` the pill without the box, valid mid-sentence; `vinyl`
 drops the box and spins the cover as a record while something plays; `glass` is a frosted
-translucent panel with the cover's colour as an ambient glow around it. `tinted="true"` paints a
-boxed variant (`card`, `pill`, `glass`) with the cover's colour, white text on top — a no-op until
-the colour is known. `center="true"` caps a block variant at 28 rem and centres it.
+translucent panel with the cover's colour as an ambient glow around it. `background` picks the
+fill of a boxed variant (`card`, `pill`, `glass`), themed by the cover with white text on top:
+`color` is a gradient of the cover's dominant colour, `solid` the flat colour, `cover` the cover
+itself zoomed and blurred (the Spotify look); `color` and `solid` keep the plain look until the
+colour is sampled. `center="true"` caps a block variant at 28 rem and centres it.
 `content/lab/listenbrainz/` (draft-only) shows them all. Several cards for the same user on one
 page share a single source — one poll loop, one feed socket, one art lookup — so stacking them
 costs nothing extra (the API allows 30 requests per second-ish window per IP).

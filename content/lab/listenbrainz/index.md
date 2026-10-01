@@ -35,10 +35,6 @@ page.
 
 Somewhere in a sentence: right now that would be {{< listenbrainz user="arunoruto" variant="inline" >}} and the paragraph just flows on around it.
 
-## backdrop
-
-{{< listenbrainz user="arunoruto" variant="backdrop" >}}
-
 ## vinyl
 
 {{< listenbrainz user="arunoruto" variant="vinyl" >}}
@@ -47,13 +43,27 @@ Somewhere in a sentence: right now that would be {{< listenbrainz user="arunorut
 
 {{< listenbrainz user="arunoruto" variant="glass" >}}
 
-## tinted="true" on pill, card, glass
+## background="color" on pill, card, glass
 
-{{< listenbrainz user="arunoruto" variant="pill" tinted="true" >}}
+{{< listenbrainz user="arunoruto" variant="pill" background="color" >}}
 
-{{< listenbrainz user="arunoruto" tinted="true" >}}
+{{< listenbrainz user="arunoruto" background="color" >}}
 
-{{< listenbrainz user="arunoruto" variant="glass" tinted="true" >}}
+{{< listenbrainz user="arunoruto" variant="glass" background="color" >}}
+
+## background="solid" on pill, card
+
+{{< listenbrainz user="arunoruto" variant="pill" background="solid" >}}
+
+{{< listenbrainz user="arunoruto" background="solid" >}}
+
+## background="cover" on pill, card, glass
+
+{{< listenbrainz user="arunoruto" variant="pill" background="cover" >}}
+
+{{< listenbrainz user="arunoruto" background="cover" >}}
+
+{{< listenbrainz user="arunoruto" variant="glass" background="cover" >}}
 
 ## card, centred
 

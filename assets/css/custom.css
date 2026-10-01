@@ -341,79 +341,6 @@
   }
 }
 
-/* variant="backdrop": the cover, blurred and darkened, fills the card. The
-   sampled tint stands in until the art is loaded (or when there is none), so
-   the card is always light-on-dark whatever the scheme. The backdrop image is
-   the first child; everything else is positioned so DOM order stacks it on
-   top, with the stretched link last and the title link above that. */
-.listenbrainz--backdrop {
-  overflow: hidden;
-  gap: 1.25rem;
-  padding: 1.25rem;
-  border: 0;
-  border-radius: 1rem;
-  background: linear-gradient(135deg, rgb(var(--listenbrainz-tint, 70 80 110)), rgb(var(--color-neutral-900)));
-  color: #fff;
-  box-shadow: 0 24px 48px -28px rgb(var(--listenbrainz-tint, 0 0 0) / 0.9);
-}
-
-.listenbrainz__backdrop {
-  position: absolute;
-  inset: -25%;
-  width: 150%;
-  height: 150%;
-  margin: 0;
-  object-fit: cover;
-  opacity: 0;
-  filter: blur(32px) saturate(1.6) brightness(0.55);
-  transition: opacity 600ms;
-  pointer-events: none;
-}
-
-.listenbrainz.has-art .listenbrainz__backdrop {
-  opacity: 1;
-}
-
-.listenbrainz--backdrop .listenbrainz__art {
-  position: relative;
-  width: 5.5rem;
-  height: 5.5rem;
-  background: rgb(255 255 255 / 0.12);
-  color: rgb(255 255 255 / 0.5);
-  box-shadow: 0 10px 28px -8px rgb(0 0 0 / 0.7);
-}
-
-.listenbrainz--backdrop .listenbrainz__track {
-  font-size: 1.15rem;
-  font-weight: 700;
-}
-
-.listenbrainz--backdrop .listenbrainz__track a,
-.dark .listenbrainz--backdrop .listenbrainz__track a {
-  color: #fff;
-}
-
-.listenbrainz--backdrop .listenbrainz__status,
-.dark .listenbrainz--backdrop .listenbrainz__status,
-.listenbrainz--backdrop[data-listenbrainz-state="playing"] .listenbrainz__status,
-.dark .listenbrainz--backdrop[data-listenbrainz-state="playing"] .listenbrainz__status {
-  color: rgb(255 255 255 / 0.75);
-}
-
-.listenbrainz--backdrop .listenbrainz__meta,
-.dark .listenbrainz--backdrop .listenbrainz__meta {
-  color: rgb(255 255 255 / 0.8);
-}
-
-.listenbrainz--backdrop .listenbrainz__profile,
-.listenbrainz--backdrop:hover .listenbrainz__profile {
-  color: rgb(255 255 255 / 0.6);
-}
-
-.listenbrainz--backdrop:hover .listenbrainz__profile {
-  color: #fff;
-}
-
 /* variant="vinyl": no box; the cover is a record with a spindle hole that
    spins while something is playing and stops where it was otherwise. */
 .listenbrainz--vinyl {
@@ -524,48 +451,83 @@
   border-color: rgb(var(--listenbrainz-tint, var(--color-primary-500)) / 0.8);
 }
 
-/* tinted="true": the cover's colour becomes the background of a boxed variant
-   (card, pill, glass). A translucent layer of the tint over a near-black base
-   keeps it deep enough for white text whatever the sleeve. Nothing happens
+/* background="color" | "solid" | "cover": the cover themes the fill of a boxed
+   variant (card, pill, glass). color is a gradient of the sampled tint, solid
+   the flat tint, cover the cover itself zoomed and blurred, with the tint (or
+   a slate) standing in until it has loaded. All three sit over a near-black
+   base so white text reads whatever the sleeve. color and solid do nothing
    until the colour is sampled, so the normal look is the fallback. The
    [data-listenbrainz-state] hook only adds specificity over the .dark rules. */
-.listenbrainz--tinted.has-tint.listenbrainz--card,
-.listenbrainz--tinted.has-tint.listenbrainz--pill,
-.listenbrainz--tinted.has-tint.listenbrainz--glass {
-  border-color: rgb(var(--listenbrainz-tint) / 0.6);
+.listenbrainz:is(.listenbrainz--bg-color, .listenbrainz--bg-solid).has-tint[data-listenbrainz-state],
+.listenbrainz.listenbrainz--bg-cover[data-listenbrainz-state] {
+  border-color: rgb(var(--listenbrainz-tint, 70 80 110) / 0.6);
+  color: #fff;
+  box-shadow: 0 16px 40px -18px rgb(var(--listenbrainz-tint, 0 0 0) / 0.9);
+}
+
+.listenbrainz.listenbrainz--bg-color.has-tint[data-listenbrainz-state] {
   background:
     linear-gradient(135deg, rgb(var(--listenbrainz-tint) / 0.78), rgb(var(--listenbrainz-tint) / 0.42))
     rgb(18 18 24);
-  color: #fff;
-  box-shadow: 0 16px 40px -18px rgb(var(--listenbrainz-tint) / 0.9);
 }
 
-.listenbrainz--tinted.has-tint.listenbrainz--glass::before {
+.listenbrainz.listenbrainz--bg-solid.has-tint[data-listenbrainz-state] {
+  background: linear-gradient(rgb(var(--listenbrainz-tint) / 0.7), rgb(var(--listenbrainz-tint) / 0.7)) rgb(18 18 24);
+}
+
+.listenbrainz.listenbrainz--bg-cover[data-listenbrainz-state] {
+  overflow: hidden;
+  background: linear-gradient(135deg, rgb(var(--listenbrainz-tint, 70 80 110)), rgb(var(--color-neutral-900)));
+}
+
+/* The cover image is the first child and everything else is positioned, so
+   DOM order stacks it underneath - the stretched link last, the title link
+   above that. Oversized so the blur has no transparent fringe. */
+.listenbrainz__backdrop {
+  position: absolute;
+  inset: -25%;
+  width: 150%;
+  height: 150%;
+  margin: 0;
+  object-fit: cover;
   opacity: 0;
+  filter: blur(32px) saturate(1.6) brightness(0.55);
+  transition: opacity 600ms;
+  pointer-events: none;
 }
 
-.listenbrainz--tinted.has-tint:hover {
+.listenbrainz.has-art .listenbrainz__backdrop {
+  opacity: 1;
+}
+
+.listenbrainz--glass:is(.listenbrainz--bg-color, .listenbrainz--bg-solid).has-tint::before,
+.listenbrainz--glass.listenbrainz--bg-cover::before {
+  opacity: 0; /* the fill replaces the ambient wash */
+}
+
+.listenbrainz:is(.listenbrainz--bg-color.has-tint, .listenbrainz--bg-solid.has-tint, .listenbrainz--bg-cover)[data-listenbrainz-state]:hover {
   border-color: rgb(255 255 255 / 0.6);
 }
 
-.listenbrainz.listenbrainz--tinted.has-tint[data-listenbrainz-state] .listenbrainz__art {
+.listenbrainz:is(.listenbrainz--bg-color.has-tint, .listenbrainz--bg-solid.has-tint, .listenbrainz--bg-cover)[data-listenbrainz-state] .listenbrainz__art {
   background: rgb(255 255 255 / 0.15);
   color: rgb(255 255 255 / 0.6);
+  box-shadow: 0 10px 28px -8px rgb(0 0 0 / 0.6);
 }
 
-.listenbrainz.listenbrainz--tinted.has-tint[data-listenbrainz-state] .listenbrainz__status,
-.listenbrainz.listenbrainz--tinted.has-tint[data-listenbrainz-state] .listenbrainz__meta,
-.listenbrainz.listenbrainz--tinted.has-tint[data-listenbrainz-state] .listenbrainz__profile {
+.listenbrainz:is(.listenbrainz--bg-color.has-tint, .listenbrainz--bg-solid.has-tint, .listenbrainz--bg-cover)[data-listenbrainz-state] .listenbrainz__status,
+.listenbrainz:is(.listenbrainz--bg-color.has-tint, .listenbrainz--bg-solid.has-tint, .listenbrainz--bg-cover)[data-listenbrainz-state] .listenbrainz__meta,
+.listenbrainz:is(.listenbrainz--bg-color.has-tint, .listenbrainz--bg-solid.has-tint, .listenbrainz--bg-cover)[data-listenbrainz-state] .listenbrainz__profile {
   color: rgb(255 255 255 / 0.82);
 }
 
-.listenbrainz.listenbrainz--tinted.has-tint[data-listenbrainz-state] .listenbrainz__track a,
-.listenbrainz.listenbrainz--tinted.has-tint[data-listenbrainz-state] .listenbrainz__link:focus-visible {
+.listenbrainz:is(.listenbrainz--bg-color.has-tint, .listenbrainz--bg-solid.has-tint, .listenbrainz--bg-cover)[data-listenbrainz-state] .listenbrainz__track a,
+.listenbrainz:is(.listenbrainz--bg-color.has-tint, .listenbrainz--bg-solid.has-tint, .listenbrainz--bg-cover)[data-listenbrainz-state] .listenbrainz__link:focus-visible {
   color: #fff;
   outline-color: #fff;
 }
 
-.listenbrainz.listenbrainz--tinted.has-tint[data-listenbrainz-state]:hover .listenbrainz__profile {
+.listenbrainz:is(.listenbrainz--bg-color.has-tint, .listenbrainz--bg-solid.has-tint, .listenbrainz--bg-cover)[data-listenbrainz-state]:hover .listenbrainz__profile {
   color: #fff;
 }
 
