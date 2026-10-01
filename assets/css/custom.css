@@ -15,6 +15,7 @@
    assets/js/listenbrainz.js. States (data-listenbrainz-state): loading, playing,
    idle (last played), empty, error - the equaliser only runs while playing. */
 .listenbrainz {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -25,11 +26,33 @@
   background: rgba(var(--color-neutral-50), 1);
   line-height: 1.35;
   text-align: left;
+  transition: border-color 120ms, background-color 120ms;
 }
 
 .dark .listenbrainz {
   border-color: rgba(var(--color-neutral-700), 1);
   background: rgba(var(--color-neutral-800), 0.6);
+}
+
+/* The whole card links to the ListenBrainz history: an empty anchor stretched
+   over it, under the track title's own link (which keeps its z-index). */
+.listenbrainz__link {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.listenbrainz__link:focus-visible {
+  outline: 2px solid rgb(var(--color-primary-500));
+  outline-offset: 2px;
+}
+
+.listenbrainz:hover {
+  border-color: rgb(var(--color-primary-500));
+}
+
+.listenbrainz:hover .listenbrainz__profile {
+  color: rgb(var(--color-primary-500));
 }
 
 .listenbrainz__art {
@@ -116,6 +139,8 @@
 }
 
 .listenbrainz__track a {
+  position: relative;
+  z-index: 1;
   text-decoration: none;
 }
 
@@ -149,9 +174,6 @@
   height: 100%;
 }
 
-.listenbrainz__profile:hover {
-  color: rgb(var(--color-primary-500));
-}
 
 /* Three bars bouncing out of phase, the classic "it's alive" badge. */
 .listenbrainz__eq {
@@ -219,6 +241,14 @@
 
 .dark .listenbrainz--pill {
   background: rgba(var(--color-neutral-800), 0.55);
+}
+
+.listenbrainz--pill:hover {
+  background: rgba(var(--color-neutral), 0.85);
+}
+
+.dark .listenbrainz--pill:hover {
+  background: rgba(var(--color-neutral-800), 0.8);
 }
 
 .listenbrainz--pill .listenbrainz__art {

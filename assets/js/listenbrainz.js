@@ -130,7 +130,8 @@ function mount(root) {
       if (info.origin_url) {
         const a = document.createElement("a");
         a.href = info.origin_url;
-        a.rel = "noopener";
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
         a.textContent = t.track_name;
         track.append(a);
       } else {
