@@ -154,10 +154,19 @@ Math: drop `{{< katex >}}` into the post once; `\(…\)` inline and `$$…$$` bl
 
 `{{< listenbrainz user="arunoruto" >}}` renders a "now playing / last played" card fed by the
 public [ListenBrainz](https://listenbrainz.org) API. Nothing happens at build time: the visitor's
-browser polls `playing-now` and the latest listen every 30 s while the tab is visible (the API is
-CORS-open and needs no key), and the shortcode's markup doubles as the no-JS fallback — a plain
-link to the profile. The homepage uses `variant="pill"`, a one-line badge that centres with the
-hero text; `center="true"` caps the default card at 28 rem for use outside prose.
+browser fetches `playing-now` and the latest listen (the API is CORS-open and needs no key), and
+the shortcode's markup doubles as the no-JS fallback — a plain link to the profile. The homepage
+uses `variant="pill"`, a one-line badge that centres with the hero text; `center="true"` caps the
+default card at 28 rem for use outside prose.
+
+Updates come from the same Socket.IO feed listenbrainz.org's own user page subscribes to, spoken
+over a bare WebSocket (no client library): a `playing_now` or `listen` event triggers a refetch, so
+a new track shows within a second. The feed is undocumented and only ever *triggers*; the HTTP API
+stays the source of truth, and if the socket fails the card falls back to polling every 30 s
+(every 2 min as a safety net while the feed is up). A timer also re-checks when the live track
+should have ended, using the duration the scrobbler sent. The last result sits in `sessionStorage`
+so the next page paints the known track immediately. `data-listenbrainz-feed` on the card says
+`live` or `poll`.
 
 Cover art: finished listens come back with a Cover Art Archive id, but a playing-now listen has no
 MusicBrainz mapping yet. `assets/js/listenbrainz.js` reuses the just-submitted listen when it is
