@@ -31,9 +31,14 @@ const SAFETY_MS = 120_000; // feed up: it does the work, this catches missed eve
 const RETRY_MS = 90_000; // after an API error
 const FEED_RETRY_MS = [5_000, 120_000]; // reconnect backoff: first try, cap
 const CACHE_MS = 5 * 60_000; // how long a sessionStorage snapshot may paint
+const UNKNOWN_LENGTH_MS = 10 * 60_000; // how long a live track without a duration counts as playing
+
+const TIMEOUT_MS = 10_000; // give up on a request well before the browser would
 
 async function getJSON(url) {
-  const res = await fetch(url, { headers: { Accept: "application/json" } });
+  // AbortSignal.timeout is missing in older Safari; there the browser's own timeout applies.
+  const signal = typeof AbortSignal.timeout === "function" ? AbortSignal.timeout(TIMEOUT_MS) : undefined;
+  const res = await fetch(url, { headers: { Accept: "application/json" }, signal });
   if (!res.ok) throw new Error(`${res.status} for ${url}`);
   return res.json();
 }
@@ -281,7 +286,8 @@ function openFeed(user, handlers) {
       } catch { /* not for us */ }
     }
   };
-  ws.onerror = () => ws.close();
+  // No onerror handler: a failed socket closes itself and onclose takes over.
+  // Closing it again from onerror only makes Safari log a spurious error.
   ws.onclose = () => {
     clearTimeout(watchdog);
     handlers.onClose();
@@ -299,6 +305,7 @@ function createSource(user) {
   const subscribers = new Set();
   const art = new Map(); // track key -> Promise<{ url, tint }>, both nullable
   let snapshot = { state: "loading" };
+  let failing = false; // inside an API outage
   let feedMode = "poll";
   let endGuess = null; // when the live track should be over (ms epoch)
   let timer = null;
@@ -357,7 +364,9 @@ function createSource(user) {
     } else if (!live) {
       endGuess = null;
     }
-    snapshot = { state: live ? "playing" : "idle", live, listen, recent };
+    // Until when the track can still be playing, for when the API goes quiet.
+    const liveUntil = live ? seenAt + (durationMs(listen) ?? UNKNOWN_LENGTH_MS) : null;
+    snapshot = { state: live ? "playing" : "idle", live, listen, recent, liveUntil };
     artFor(listen, recent);
     emit();
     writeCache();
@@ -381,10 +390,19 @@ function createSource(user) {
         emit();
       }
       schedule();
+      if (failing) console.info("listenbrainz: API reachable again");
+      failing = false;
     } catch (err) {
-      console.warn("listenbrainz:", err);
+      // One warning per outage, not one per retry.
+      if (!failing) console.warn("listenbrainz: API unreachable, retrying in the background", err);
+      failing = true;
       if (!snapshot.listen) {
         snapshot = { state: "error" };
+        emit();
+      } else if (snapshot.live && Date.now() > snapshot.liveUntil) {
+        // The API is down and the track must be over by now: stop claiming
+        // it is playing, keep it as the last thing heard.
+        snapshot = { ...snapshot, state: "idle", live: false };
         emit();
       }
       schedule(RETRY_MS);
@@ -548,7 +566,11 @@ function mount(root) {
     }
     const t = snap.listen.track_metadata;
     const info = t.additional_info || {};
-    label.textContent = snap.live ? "Now playing" : `Last played ${ago(snap.listen.listened_at)}`;
+    // A playing-now listen has no listened_at; demoted during an outage it is
+    // simply the last thing heard.
+    label.textContent = snap.live
+      ? "Now playing"
+      : snap.listen.listened_at ? `Last played ${ago(snap.listen.listened_at)}` : "Recently played";
 
     const key = trackKey(snap.listen);
     // Every snapshot re-asks: cached, it costs nothing, and a cover ListenBrainz
