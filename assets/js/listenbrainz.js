@@ -503,6 +503,16 @@ function mount(root) {
   const backdrop = root.querySelector(".listenbrainz__backdrop"); // backdrop variant only
   const label = root.querySelector(".listenbrainz__label");
   const agoEl = root.querySelector(".listenbrainz__ago");
+  const link = root.querySelector(".listenbrainz__link");
+  // The markup's own text, kept on the element so it is only ever prefixed once.
+  const linkTitle = (link.dataset.title ??= link.title); // "My listening history on ListenBrainz"
+
+  /* The label is read by screen readers and leads the hover text, e.g.
+     "Now playing – My listening history on ListenBrainz". */
+  function setLabel(text) {
+    label.textContent = text;
+    link.title = `${text} – ${linkTitle}`;
+  }
   const track = root.querySelector(".listenbrainz__track");
   const artist = root.querySelector(".listenbrainz__artist");
   const release = root.querySelector(".listenbrainz__release");
@@ -573,18 +583,18 @@ function mount(root) {
     const snap = lastSnap;
     if (!snap?.listen) return;
     if (snap.live) {
-      label.textContent = "Now playing";
+      setLabel("Now playing");
       agoEl.textContent = "";
       return;
     }
     const started = snap.listen.listened_at;
     if (!started) {
-      label.textContent = "Recently played";
+      setLabel("Recently played");
       agoEl.textContent = "";
       return;
     }
     const stopped = started * 1000 + (durationMs(snap.listen) ?? 0);
-    label.textContent = `Last played ${ago(Math.min(stopped, Date.now()) / 1000)}`;
+    setLabel(`Last played ${ago(Math.min(stopped, Date.now()) / 1000)}`);
     agoEl.textContent = since(Math.min(stopped, Date.now()));
   }
   // Keep "12m" current between polls (which can be minutes apart with the feed up).
@@ -597,7 +607,7 @@ function mount(root) {
     root.dataset.listenbrainzFeed = feedMode;
     root.dataset.listenbrainzState = snap.state;
     if (!snap.listen) {
-      if (snap.state === "error") label.textContent = "Offline";
+      if (snap.state === "error") setLabel("Offline");
       return; // loading / empty / error: keep the fallback markup
     }
     const t = snap.listen.track_metadata;
