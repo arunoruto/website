@@ -478,17 +478,52 @@ function mount(root) {
   const artist = root.querySelector(".listenbrainz__artist");
   const release = root.querySelector(".listenbrainz__release");
   let shownKey = null;
+  let swap = 0; // bumps on every text swap, so a stale timeout does not fill in
+  let incoming = null; // cover URL being preloaded for a crossfade
+  const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   cover.addEventListener("error", () => root.classList.remove("has-art"));
   cover.addEventListener("load", () => root.classList.add("has-art"));
 
-  function showArt({ url, tint }) {
+  /* Crossfade between tracks: a copy of the outgoing image stays on top and
+     fades away (.listenbrainz__ghost) over the incoming one, which is loaded
+     before it is shown, so the card never drops to the placeholder disc. */
+  function ghost(img) {
+    if (!img?.getAttribute("src")) return;
+    const copy = img.cloneNode();
+    copy.classList.add("listenbrainz__ghost");
+    copy.setAttribute("aria-hidden", "true");
+    copy.addEventListener("animationend", () => copy.remove(), { once: true });
+    setTimeout(() => copy.remove(), 1_000); // background tabs never end the animation
+    img.after(copy);
+  }
+
+  async function showArt({ url, tint }) {
     if (!url) {
       root.classList.remove("has-art");
       cover.removeAttribute("src");
       backdrop?.removeAttribute("src");
-    } else if (cover.getAttribute("src") !== url) {
-      root.classList.remove("has-art");
+    } else if (cover.getAttribute("src") !== url && incoming !== url) {
+      const key = shownKey;
+      const crossfade = root.classList.contains("has-art") && !calm.matches;
+      if (crossfade) {
+        // onload rather than decode(): decode() never settles in a background
+        // tab, and the image is cached and cheap to paint once it has loaded.
+        incoming = url; // later updates for the same cover wait for this one
+        const loaded = await new Promise((resolve) => {
+          const next = new Image();
+          next.onload = () => resolve(true);
+          next.onerror = () => resolve(false);
+          next.src = url;
+        });
+        if (incoming === url) incoming = null;
+        if (!loaded) return; // unloadable: keep the old cover rather than show a gap
+        if (shownKey !== key) return; // the track changed while loading
+        ghost(cover);
+        ghost(backdrop);
+      } else {
+        root.classList.remove("has-art");
+      }
       cover.src = url;
       if (backdrop) backdrop.src = url;
     }
@@ -522,20 +557,33 @@ function mount(root) {
       if (shownKey === key) showArt(resolved); // else the track changed meanwhile
     });
     if (key === shownKey) return;
+    const first = shownKey === null; // replacing the no-JS fallback: no fade
     shownKey = key;
-    track.replaceChildren();
-    if (info.origin_url) {
-      const a = document.createElement("a");
-      a.href = info.origin_url;
-      a.target = "_blank";
-      a.rel = "noopener noreferrer";
-      a.textContent = t.track_name;
-      track.append(a);
+
+    const fill = () => {
+      track.replaceChildren();
+      if (info.origin_url) {
+        const a = document.createElement("a");
+        a.href = info.origin_url;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.textContent = t.track_name;
+        track.append(a);
+      } else {
+        track.textContent = t.track_name;
+      }
+      artist.textContent = t.artist_name || "";
+      release.textContent = t.release_name || "";
+      root.classList.remove("is-swapping");
+    };
+    const mine = ++swap;
+    if (first || calm.matches) {
+      fill();
     } else {
-      track.textContent = t.track_name;
+      // Fade the old lines out (CSS, 180 ms), swap, and let them fade back in.
+      root.classList.add("is-swapping");
+      setTimeout(() => mine === swap && fill(), 180);
     }
-    artist.textContent = t.artist_name || "";
-    release.textContent = t.release_name || "";
   });
 }
 

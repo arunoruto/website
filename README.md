@@ -302,6 +302,9 @@ still polls every 2 min as a safety net. A timer also re-checks when the live tr
 ended, using the duration the scrobbler sent.
 
 The last result sits in `sessionStorage`, so the next page paints the known track immediately.
+On a track change the title and artist fade out and back in, and the cover crossfades: the new one
+is loaded first while the old one fades away on top of it, so the card never drops to the
+placeholder disc. Visitors who prefer reduced motion get an instant swap.
 `data-listenbrainz-feed` on the card says `live` or `poll`.
 
 Several cards for the same user on one page share a single source: one poll loop, one feed socket,

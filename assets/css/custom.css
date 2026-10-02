@@ -105,6 +105,37 @@
   flex: 1;
 }
 
+/* Track change: the text lines fade out, swap and fade back in (the script
+   toggles .is-swapping); the outgoing cover lingers as a ghost copy that fades
+   away over the incoming one. */
+.listenbrainz__track,
+.listenbrainz__meta {
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.listenbrainz.is-swapping .listenbrainz__track,
+.listenbrainz.is-swapping .listenbrainz__meta {
+  opacity: 0;
+  transform: translateY(-0.2em);
+}
+
+.listenbrainz__ghost {
+  pointer-events: none;
+  animation: listenbrainz-fade-out 600ms ease forwards;
+}
+
+@keyframes listenbrainz-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .listenbrainz__track,
+  .listenbrainz__meta {
+    transition: none;
+  }
+}
+
 .listenbrainz__status {
   display: flex;
   align-items: center;
