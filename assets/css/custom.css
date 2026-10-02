@@ -209,16 +209,20 @@
 }
 
 
-/* Three bars bouncing out of phase, the classic "it's alive" badge. */
+/* Status: three bars bouncing out of phase while something plays, the same
+   bars frozen and dimmed plus the compact time since the music stopped
+   otherwise. The spelled-out label stays in the page for screen readers (and
+   is shown in the no-JS fallback and "Offline"). */
 .listenbrainz__eq {
   display: none;
+  flex: none;
   align-items: flex-end;
   gap: 2px;
   width: 12px;
   height: 11px;
 }
 
-.listenbrainz[data-listenbrainz-state="playing"] .listenbrainz__eq {
+.listenbrainz:is([data-listenbrainz-state="playing"], [data-listenbrainz-state="idle"]) .listenbrainz__eq {
   display: inline-flex;
 }
 
@@ -228,6 +232,7 @@
   background: currentColor;
   border-radius: 1px;
   animation: listenbrainz-eq 0.9s ease-in-out infinite alternate;
+  transition: height 400ms ease, opacity 400ms ease;
 }
 
 .listenbrainz__eq i:nth-child(2) { animation-delay: -0.3s; }
@@ -238,11 +243,44 @@
   to { height: 100%; }
 }
 
+/* Stopped: the bars freeze mid-bounce, like a paused equaliser. Uneven on
+   purpose: three equal stubs would read as an ellipsis ("loading"). */
+.listenbrainz[data-listenbrainz-state="idle"] .listenbrainz__eq {
+  opacity: 0.65;
+}
+
+.listenbrainz[data-listenbrainz-state="idle"] .listenbrainz__eq i {
+  animation: none;
+  height: 55%;
+}
+
+.listenbrainz[data-listenbrainz-state="idle"] .listenbrainz__eq i:nth-child(2) { height: 85%; }
+.listenbrainz[data-listenbrainz-state="idle"] .listenbrainz__eq i:nth-child(3) { height: 35%; }
+
 @media (prefers-reduced-motion: reduce) {
-  .listenbrainz__eq i {
+  .listenbrainz[data-listenbrainz-state="playing"] .listenbrainz__eq i {
     animation: none;
     height: 70%;
   }
+}
+
+.listenbrainz__ago {
+  text-transform: none;
+  letter-spacing: normal;
+  font-variant-numeric: tabular-nums;
+}
+
+.listenbrainz__ago:empty {
+  display: none;
+}
+
+.listenbrainz:is([data-listenbrainz-state="playing"], [data-listenbrainz-state="idle"]) .listenbrainz__label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .listenbrainz--center {
@@ -361,15 +399,8 @@
 .listenbrainz--pill .listenbrainz__release,
 .listenbrainz--inline .listenbrainz__release,
 .listenbrainz--pill .listenbrainz__profile,
-.listenbrainz--inline .listenbrainz__profile,
-.listenbrainz--inline[data-listenbrainz-state="playing"] .listenbrainz__label {
-  display: none; /* mid-sentence, the bars alone say "playing" */
-}
-
-@media (max-width: 640px) {
-  .listenbrainz--pill .listenbrainz__status .listenbrainz__label {
-    display: none; /* bars alone say "playing" on a phone */
-  }
+.listenbrainz--inline .listenbrainz__profile {
+  display: none;
 }
 
 /* variant="vinyl": no box; the cover is a record with a spindle hole that

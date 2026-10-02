@@ -237,6 +237,16 @@ function sampleTint(url) {
 }
 
 const relative = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
+const narrow = (n, unit) => new Intl.NumberFormat(undefined, { style: "unit", unit, unitDisplay: "narrow" }).format(n);
+
+/* "12m", "3h", "2d" (localized) since a moment, for the badge next to the pause icon. */
+function since(ms) {
+  const minutes = Math.floor((Date.now() - ms) / 60_000);
+  if (minutes < 1) return `<${narrow(1, "minute")}`;
+  if (minutes < 60) return narrow(minutes, "minute");
+  if (minutes < 24 * 60) return narrow(Math.floor(minutes / 60), "hour");
+  return narrow(Math.floor(minutes / (24 * 60)), "day");
+}
 
 function ago(unixSeconds) {
   const delta = Math.round((unixSeconds * 1000 - Date.now()) / 1000);
@@ -492,6 +502,7 @@ function mount(root) {
   const cover = root.querySelector(".listenbrainz__cover");
   const backdrop = root.querySelector(".listenbrainz__backdrop"); // backdrop variant only
   const label = root.querySelector(".listenbrainz__label");
+  const agoEl = root.querySelector(".listenbrainz__ago");
   const track = root.querySelector(".listenbrainz__track");
   const artist = root.querySelector(".listenbrainz__artist");
   const release = root.querySelector(".listenbrainz__release");
@@ -554,6 +565,31 @@ function mount(root) {
     }
   }
 
+  /* ListenBrainz knows when the last track started and how long it is, not
+     when playback was paused, so "stopped" means: start + length. A playing-
+     now listen demoted during an outage has no listened_at at all. */
+  let lastSnap = null;
+  function renderStatus() {
+    const snap = lastSnap;
+    if (!snap?.listen) return;
+    if (snap.live) {
+      label.textContent = "Now playing";
+      agoEl.textContent = "";
+      return;
+    }
+    const started = snap.listen.listened_at;
+    if (!started) {
+      label.textContent = "Recently played";
+      agoEl.textContent = "";
+      return;
+    }
+    const stopped = started * 1000 + (durationMs(snap.listen) ?? 0);
+    label.textContent = `Last played ${ago(Math.min(stopped, Date.now()) / 1000)}`;
+    agoEl.textContent = since(Math.min(stopped, Date.now()));
+  }
+  // Keep "12m" current between polls (which can be minutes apart with the feed up).
+  setInterval(() => document.visibilityState === "visible" && renderStatus(), 30_000);
+
   if (!sources.has(user)) sources.set(user, createSource(user));
   const source = sources.get(user);
 
@@ -566,11 +602,8 @@ function mount(root) {
     }
     const t = snap.listen.track_metadata;
     const info = t.additional_info || {};
-    // A playing-now listen has no listened_at; demoted during an outage it is
-    // simply the last thing heard.
-    label.textContent = snap.live
-      ? "Now playing"
-      : snap.listen.listened_at ? `Last played ${ago(snap.listen.listened_at)}` : "Recently played";
+    lastSnap = snap;
+    renderStatus();
 
     const key = trackKey(snap.listen);
     // Every snapshot re-asks: cached, it costs nothing, and a cover ListenBrainz

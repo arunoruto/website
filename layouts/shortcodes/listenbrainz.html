@@ -68,6 +68,8 @@
   <span class="listenbrainz__body">
     <span class="listenbrainz__status">
       <span class="listenbrainz__eq" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="listenbrainz__ago" aria-hidden="true"></span>
+      {{- /* Spelled out for screen readers, the no-JS fallback and "Offline"; the bars stand in for it otherwise. */}}
       <span class="listenbrainz__label">Now playing</span>
     </span>
     <span class="listenbrainz__track"><a href="{{ $profile }}" target="_blank" rel="noopener noreferrer">What I’m listening to</a></span>
