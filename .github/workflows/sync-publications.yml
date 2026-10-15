@@ -36,7 +36,7 @@ jobs:
       # hardening) - "@v9" does not exist and fails the job before it starts.
       # Pin the full version; Dependabot's github-actions updates bump it.
       - name: Install uv
-        uses: astral-sh/setup-uv@v10.2.0
+        uses: astral-sh/setup-uv@v10.3.0
 
       - name: Run sync script
         env:
