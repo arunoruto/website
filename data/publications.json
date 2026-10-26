@@ -18,7 +18,7 @@
     "venue": "Astronomy & Astrophysics",
     "publisher": "EDP Sciences",
     "abstract": "Context . Imaging polarimetry enables the spatially resolved investigation of cometary dust properties across different morphological structures. While cometary comae have been studied thoroughly in the pertinent literature, cometary tails have remained less explored. Comparing these regions can reveal differences in the size, structure, and composition of their dust. Aims . The goal of this study is to examine the size, structure and composition of the dust particles in the coma and in particular in the tail of the bright comet C/2023 A3 (Tsuchinshan-ATLAS) and to infer possible differences. Methods . For this purpose, we rely on the method of telescopic wide-field polarimetric imaging of the comet in the visible to nearinfrared domain in order to obtain the dependence of the degree of linear polarization (DoLP) of the coma and tail on the phase angle across a broad range. An off-the-shelf industrial grade polarization camera was used in combination with a telescope of short aperture ratio. These observations are complemented by T-matrix and discrete dipole approximation modeling using the MSTM5 and DDSCAT software framework, respectively, for simulation of light scattering by dust particles of fractal agglomerate and agglomerate debris morphology. Results . Our observations indicate that the coma exhibits a high maximum DoLP of 0.34, which is further exceeded by a factor of about two by the DoLP of the comet’s tail. Our modeling results suggest a 50:50 olivine-carbon composition. The fraction of agglomerate debris was found to be 50% in the coma and possibly higher in the tail. The differences between the coma and the tail in the observed maximum DoLP and the phase angle at which it occurs can be explained by a predominance of particles with radii larger than 0.6 μm in the coma versus smaller sub-micrometer particles close to the Rayleigh limit in the tail, assuming power-law size distributions with exponents of 2 and 5, respectively. Conclusions . Our results are consistent with smaller particles being transported from the coma into the tail more efficiently than larger particles by the solar radiation pressure. The possibly larger agglomerate debris fraction in the tail than in the coma may be a dynamical effect due to the mass difference between porous and compact particles of similar size.",
-    "citations": 0,
+    "citations": 1,
     "ids": {
       "doi": "10.1051/0004-6361/202555905",
       "scholar": "BtfJWZkAAAAJ:Se3iqnhoufwC",
@@ -27,11 +27,12 @@
     "links": {
       "primary": "https://doi.org/10.1051/0004-6361/202555905",
       "doi": "https://doi.org/10.1051/0004-6361/202555905",
-      "scholar": "https://scholar.google.com/citations?view_op=view_citation&user=BtfJWZkAAAAJ&citation_for_view=BtfJWZkAAAAJ%3ASe3iqnhoufwC"
+      "scholar": "https://scholar.google.com/citations?view_op=view_citation&user=BtfJWZkAAAAJ&citation_for_view=BtfJWZkAAAAJ%3ASe3iqnhoufwC",
+      "scholarCitedBy": "https://scholar.google.com/scholar?oi=bibs&hl=en&cites=4305556310440380342"
     },
     "sync": {
       "source": "orcid",
-      "researchGateChecked": "2026-09-21"
+      "researchGateChecked": "2026-10-26"
     }
   },
   {
@@ -63,7 +64,7 @@
     },
     "sync": {
       "source": "orcid",
-      "researchGateChecked": "2026-09-21"
+      "researchGateChecked": "2026-10-26"
     }
   },
   {
@@ -92,11 +93,12 @@
     },
     "links": {
       "primary": "https://doi.org/10.5194/epsc2026-883",
-      "doi": "https://doi.org/10.5194/epsc2026-883"
+      "doi": "https://doi.org/10.5194/epsc2026-883",
+      "researchgate": "https://www.researchgate.net/publication/414541072_Investigating_Lunar_Swirls_Using_a_Multimodal_Transformer_A_Masked_Autoencoder_Approach_for_Integrating_Heterogeneous_Planetary_Remote_Sensing_Data"
     },
     "sync": {
       "source": "orcid",
-      "researchGateChecked": "2026-09-21"
+      "researchGateChecked": "2026-10-26"
     }
   },
   {
@@ -130,7 +132,7 @@
     },
     "sync": {
       "source": "orcid",
-      "researchGateChecked": "2026-09-21"
+      "researchGateChecked": "2026-10-26"
     }
   },
   {
@@ -194,7 +196,7 @@
     },
     "sync": {
       "source": "orcid",
-      "researchGateChecked": "2026-09-21"
+      "researchGateChecked": "2026-10-26"
     }
   },
   {
@@ -224,7 +226,7 @@
     },
     "sync": {
       "source": "orcid",
-      "researchGateChecked": "2026-09-21"
+      "researchGateChecked": "2026-10-26"
     }
   },
   {
@@ -255,7 +257,7 @@
     },
     "sync": {
       "source": "orcid",
-      "researchGateChecked": "2026-09-21"
+      "researchGateChecked": "2026-10-26"
     }
   },
   {
@@ -287,7 +289,7 @@
     },
     "sync": {
       "source": "orcid",
-      "researchGateChecked": "2026-09-21"
+      "researchGateChecked": "2026-10-26"
     }
   },
   {
@@ -320,7 +322,7 @@
     },
     "sync": {
       "source": "orcid",
-      "researchGateChecked": "2026-09-21"
+      "researchGateChecked": "2026-10-26"
     }
   },
   {
@@ -355,7 +357,7 @@
     },
     "sync": {
       "source": "orcid",
-      "researchGateChecked": "2026-09-21"
+      "researchGateChecked": "2026-10-26"
     }
   },
   {
@@ -393,7 +395,7 @@
     },
     "sync": {
       "source": "orcid",
-      "researchGateChecked": "2026-09-21"
+      "researchGateChecked": "2026-10-26"
     }
   },
   {
@@ -424,7 +426,7 @@
     },
     "sync": {
       "source": "orcid",
-      "researchGateChecked": "2026-09-21"
+      "researchGateChecked": "2026-10-26"
     }
   },
   {
@@ -459,7 +461,7 @@
     },
     "sync": {
       "source": "orcid",
-      "researchGateChecked": "2026-09-21"
+      "researchGateChecked": "2026-10-26"
     }
   },
   {
@@ -491,7 +493,7 @@
     },
     "sync": {
       "source": "orcid",
-      "researchGateChecked": "2026-09-21"
+      "researchGateChecked": "2026-10-26"
     }
   },
   {
@@ -523,7 +525,7 @@
     },
     "sync": {
       "source": "orcid",
-      "researchGateChecked": "2026-09-21"
+      "researchGateChecked": "2026-10-26"
     }
   },
   {
@@ -555,7 +557,7 @@
     },
     "sync": {
       "source": "orcid",
-      "researchGateChecked": "2026-09-21"
+      "researchGateChecked": "2026-10-26"
     }
   },
   {
@@ -586,7 +588,7 @@
     },
     "sync": {
       "source": "orcid",
-      "researchGateChecked": "2026-09-21"
+      "researchGateChecked": "2026-10-26"
     }
   },
   {
@@ -619,7 +621,7 @@
     },
     "sync": {
       "source": "orcid",
-      "researchGateChecked": "2026-09-21"
+      "researchGateChecked": "2026-10-26"
     }
   },
   {
@@ -652,7 +654,7 @@
     },
     "sync": {
       "source": "orcid",
-      "researchGateChecked": "2026-09-21"
+      "researchGateChecked": "2026-10-26"
     }
   },
   {
@@ -753,7 +755,7 @@
     },
     "sync": {
       "source": "orcid",
-      "researchGateChecked": "2026-09-21"
+      "researchGateChecked": "2026-10-26"
     }
   }
 ]
